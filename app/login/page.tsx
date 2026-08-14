@@ -1,0 +1,84 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { handleLogin } from '@/app/actions/auth';
+
+export default function LoginPage() {
+  const router = useRouter();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsLoading(true);
+    setError('');
+
+    const formData = new FormData(event.currentTarget);
+    const result = await handleLogin(formData);
+
+    if (result?.error) {
+      setError(result.error);
+      setIsLoading(false);
+    } else {
+      router.push('/dashboard');
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-blue-700">PT BWC</h2>
+          <p className="text-gray-500 mt-2">Sistem Manajemen Proyek & Laporan</p>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center">
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={onSubmit} className="space-y-5">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
+            <input
+              type="email"
+              name="email"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
+              placeholder="admin@bwc.com"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+            <input
+              type="password"
+              name="password"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
+              placeholder="••••••••"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full bg-blue-700 text-white py-2.5 px-4 rounded-lg hover:bg-blue-800 transition font-medium disabled:bg-blue-400"
+          >
+            {isLoading ? 'Memeriksa Data...' : 'Masuk ke Dashboard'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-sm text-gray-500 bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <p className="font-semibold mb-1 text-blue-800">Akun Demo Terdaftar:</p>
+          <ul className="list-disc list-inside text-blue-700">
+            <li>Email: <strong>admin@bwc.com</strong></li>
+            <li>Password: <strong>admin123</strong></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}

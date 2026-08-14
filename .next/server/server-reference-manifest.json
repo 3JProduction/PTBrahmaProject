@@ -1,0 +1,70 @@
+{
+  "node": {
+    "2470f07a50234afbd5f3c9bb121a6769029f8389": {
+      "workers": {
+        "app/dashboard/projects/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/projects/create/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/reports/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/issues/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/reports/create/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/issues/create/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/dashboard/projects/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/projects/create/page": "action-browser",
+        "app/dashboard/reports/page": "action-browser",
+        "app/dashboard/issues/page": "action-browser",
+        "app/dashboard/reports/create/page": "action-browser",
+        "app/dashboard/issues/create/page": "action-browser"
+      }
+    },
+    "7efe3c8160d535518f079665a803bb222e2ff7d2": {
+      "workers": {
+        "app/dashboard/projects/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/projects/create/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/reports/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/issues/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/reports/create/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!",
+        "app/dashboard/issues/create/page": "(action-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cauth.ts%22%2C%5B%22handleLogin%22%2C%22handleLogout%22%5D%5D%5D&__client_imported__=true!"
+      },
+      "layer": {
+        "app/dashboard/projects/page": "action-browser",
+        "app/dashboard/page": "action-browser",
+        "app/dashboard/projects/create/page": "action-browser",
+        "app/dashboard/reports/page": "action-browser",
+        "app/dashboard/issues/page": "action-browser",
+        "app/dashboard/reports/create/page": "action-browser",
+        "app/dashboard/issues/create/page": "action-browser"
+      }
+    },
+    "da4a6f3331e141919653772786b4b898a7c958bb": {
+      "workers": {
+        "app/dashboard/projects/create/page": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cproject.ts%22%2C%5B%22createProject%22%5D%5D%5D&__client_imported__=!"
+      },
+      "layer": {
+        "app/dashboard/projects/create/page": "rsc"
+      }
+    },
+    "3b397e063d858116a74d2c89471b089feceac581": {
+      "workers": {
+        "app/dashboard/reports/create/page": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Creport.ts%22%2C%5B%22createDailyReport%22%5D%5D%5D&__client_imported__=!"
+      },
+      "layer": {
+        "app/dashboard/reports/create/page": "rsc"
+      }
+    },
+    "60148a42f6f0254d8604ac9b7bb697744f3de03a": {
+      "workers": {
+        "app/dashboard/issues/create/page": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22C%3A%5C%5CUsers%5C%5CJonathan%20Jason%20J%5C%5CDownloads%5C%5CPT-Brahma-Wahana-Cipta-Web%5C%5Capp%5C%5Cactions%5C%5Cissue.ts%22%2C%5B%22createIssue%22%5D%5D%5D&__client_imported__=!"
+      },
+      "layer": {
+        "app/dashboard/issues/create/page": "rsc"
+      }
+    }
+  },
+  "edge": {},
+  "encryptionKey": "HfcpUvabpzJYLKzahmpLueHHSn2PXWzDbfqgasXAmkY="
+}
