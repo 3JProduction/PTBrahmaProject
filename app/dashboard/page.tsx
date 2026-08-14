@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'; // Tambahkan baris ini
+
 import prisma from '@/lib/prisma';
 import { Briefcase, FileText, AlertTriangle, Activity, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
