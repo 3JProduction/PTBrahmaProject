@@ -11,11 +11,20 @@ export async function createIssue(formData: FormData) {
   const severity = formData.get('severity') as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
   // Tarik data user default (sebagai simulasi pelapor)
-  const defaultUser = await prisma.user.findUnique({
-    where: { email: 'admin@bwc.com' },
-  });
+  // const defaultUser = await prisma.user.findUnique({
+  //   where: { email: 'admin@bwc.com' },
+  // });
 
-  if (!defaultUser) throw new Error("User tidak ditemukan");
+  // if (!defaultUser) throw new Error("User tidak ditemukan");
+  const defaultUser = await prisma.user.upsert({
+  where: { email: 'admin@bwc.com' },
+  update: {},
+  create: {
+    name: 'Admin BWC',
+    email: 'admin@bwc.com',
+    role: 'ADMIN_KANTOR',
+   },
+  });
 
   // Simpan laporan kendala ke database
   await prisma.issue.create({
