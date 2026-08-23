@@ -16,17 +16,20 @@ async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
 
     try {
       const formData = new FormData(event.currentTarget);
-      const result = await handleLogin(formData);
+      // Ekstrak menjadi teks biasa di sini
+      const email = formData.get('email') as string;
+      const password = formData.get('password') as string;
+
+      // Kirim teks biasa ke server
+      const result = await handleLogin(email, password);
 
       if (result?.error) {
         setError(result.error);
-        setIsLoading(false); // Matikan loading jika password salah
+        setIsLoading(false);
       } else {
-        // SUKSES: Paksa browser pindah secara fisik agar sistem membaca Cookie baru
         window.location.href = '/dashboard';
       }
     } catch (err) {
-      // Jaga-jaga jika internet terputus atau server Vercel sedang sibuk
       setError('Terjadi kendala jaringan. Silakan coba lagi.');
       setIsLoading(false);
     }
