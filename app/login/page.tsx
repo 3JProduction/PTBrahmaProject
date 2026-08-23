@@ -26,7 +26,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-blue-700">PT BWC</h2>
@@ -47,7 +47,7 @@ export default function LoginPage() {
               name="email"
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
-              placeholder="admin@bwc.com"
+              placeholder="pm@bwc.com"
             />
           </div>
 
@@ -90,5 +90,7 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
   );
 }
