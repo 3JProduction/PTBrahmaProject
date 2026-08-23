@@ -9,19 +9,26 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
     setError('');
 
-    const formData = new FormData(event.currentTarget);
-    const result = await handleLogin(formData);
+    try {
+      const formData = new FormData(event.currentTarget);
+      const result = await handleLogin(formData);
 
-    if (result?.error) {
-      setError(result.error);
+      if (result?.error) {
+        setError(result.error);
+        setIsLoading(false); // Matikan loading jika password salah
+      } else {
+        // SUKSES: Paksa browser pindah secara fisik agar sistem membaca Cookie baru
+        window.location.href = '/dashboard';
+      }
+    } catch (err) {
+      // Jaga-jaga jika internet terputus atau server Vercel sedang sibuk
+      setError('Terjadi kendala jaringan. Silakan coba lagi.');
       setIsLoading(false);
-    } else {
-      router.push('/dashboard');
     }
   }
 
