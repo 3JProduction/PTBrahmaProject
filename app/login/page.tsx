@@ -72,13 +72,23 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-sm text-gray-500 bg-blue-50 p-4 rounded-lg border border-blue-100">
-          <p className="font-semibold mb-1 text-blue-800">Akun Demo Terdaftar:</p>
-          <ul className="list-disc list-inside text-blue-700">
-            <li>Email: <strong>admin@bwc.com</strong></li>
-            <li>Password: <strong>admin123</strong></li>
-          </ul>
+          <p className="font-semibold mb-2 text-blue-800">Akun Demo Terdaftar:</p>
+          <div className="space-y-3">
+            <div>
+              <p className="text-blue-700 font-medium">1. Project Manager (Hanya Lihat)</p>
+              <ul className="list-disc list-inside text-blue-600 ml-1">
+                <li>Email: <strong>pm@bwc.com</strong></li>
+                <li>Pass: <strong>pm123</strong></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-blue-700 font-medium">2. Site Manager (Bisa Input Data)</p>
+              <ul className="list-disc list-inside text-blue-600 ml-1">
+                <li>Email: <strong>site@bwc.com</strong></li>
+                <li>Pass: <strong>site123</strong></li>
+              </ul>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
   );
 }

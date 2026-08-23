@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { Plus } from 'lucide-react';
 import prisma from '@/lib/prisma';
+import { cookies } from 'next/headers';
 
 // Ini adalah Server Component, bisa langsung hit database
 export default async function ProjectsPage() {
+  const role = cookies().get('userRole')?.value;
   // Tarik data proyek dari database, urutkan dari yang terbaru
   const projects = await prisma.project.findMany({
     orderBy: { createdAt: 'desc' }
@@ -16,13 +18,15 @@ export default async function ProjectsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Data Proyek</h1>
           <p className="text-gray-500">Kelola semua proyek konstruksi yang sedang berjalan.</p>
         </div>
-        <Link 
-          href="/dashboard/projects/create" 
-          className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition flex items-center space-x-2 font-medium"
-        >
-          <Plus size={20} />
-          <span>Tambah Proyek</span>
-        </Link>
+        {role === 'SITE_MANAGER' && (
+          <Link 
+            href="/dashboard/projects/create" 
+            className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition flex items-center space-x-2 font-medium"
+          >
+            <Plus size={20} />
+            <span>Tambah Proyek</span>
+          </Link>
+        )}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
