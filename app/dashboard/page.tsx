@@ -1,95 +1,124 @@
-export const dynamic = 'force-dynamic'; // Tambahkan baris ini
+export const dynamic = 'force-dynamic';
 
-import prisma from '@/lib/prisma';
-import { Briefcase, FileText, AlertTriangle, Activity, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { Briefcase, FileText, AlertTriangle, CheckCircle, Activity, ArrowRight } from 'lucide-react';
+import prisma from '@/lib/prisma';
 
-export default async function DashboardHome() {
-  // 1. Mengambil statistik dari database secara paralel
-  const [activeProjects, pendingReports, unresolvedIssues] = await Promise.all([
-    prisma.project.count({ where: { status: 'ON_PROGRESS' } }),
-    prisma.dailyReport.count({ where: { status: 'PENDING' } }),
-    prisma.issue.count({ where: { isResolved: false } })
-  ]);
+export default async function DashboardPage() {
+  // 1. Tarik semua data statistik dari database
+  const activeProjectsCount = await prisma.project.count({
+    where: { status: 'ON_PROGRESS' }
+  });
 
-  // 2. Mengambil 3 proyek terbaru untuk ditampilkan di beranda
+  // (BARU) Tarik data jumlah proyek yang sudah selesai
+  const completedProjectsCount = await prisma.project.count({
+    where: { status: 'COMPLETED' }
+  });
+
+  // Asumsi status default saat laporan dibuat adalah 'PENDING'
+  const pendingReportsCount = await prisma.dailyReport.count({
+    where: { status: 'PENDING' }
+  });
+
+  const unresolvedIssuesCount = await prisma.issue.count({
+    where: { isResolved: false }
+  });
+
+  // 2. Tarik 3 data proyek terbaru untuk ditampilkan di list bawah
   const recentProjects = await prisma.project.findMany({
     take: 3,
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: 'desc' }
   });
 
   return (
     <div className="space-y-8">
-      {/* Bagian Header */}
+      {/* HEADER */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Selamat Datang di Dashboard BWAT</h1>
-        <p className="text-gray-500 mt-1">Ringkasan aktivitas dan status proyek konstruksi Anda hari ini.</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Selamat Datang di Dashboard BWAT</h1>
+        <p className="text-gray-500">Ringkasan aktivitas dan status proyek konstruksi Anda hari ini.</p>
       </div>
 
-      {/* Bagian Kartu Statistik */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Kartu Proyek Aktif */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
-          <div className="p-4 bg-blue-50 text-blue-600 rounded-lg">
-            <Briefcase size={28} />
+      {/* KARTU STATISTIK (Diubah menjadi grid-cols-4 pada layar besar) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        
+        {/* Kartu 1: Proyek Aktif */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Briefcase className="text-blue-600" size={26} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Proyek Aktif</p>
-            <h2 className="text-2xl font-bold text-gray-900">{activeProjects}</h2>
+            <p className="text-sm font-medium text-gray-500 mb-1">Proyek Aktif</p>
+            <h3 className="text-3xl font-bold text-gray-900">{activeProjectsCount}</h3>
           </div>
         </div>
 
-        {/* Kartu Laporan Menunggu */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
-          <div className="p-4 bg-yellow-50 text-yellow-600 rounded-lg">
-            <FileText size={28} />
+        {/* Kartu 2: Laporan Pending */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-yellow-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <FileText className="text-yellow-600" size={26} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Laporan Menunggu (Pending)</p>
-            <h2 className="text-2xl font-bold text-gray-900">{pendingReports}</h2>
+            <p className="text-sm font-medium text-gray-500 mb-1">Laporan Menunggu (Pending)</p>
+            <h3 className="text-3xl font-bold text-gray-900">{pendingReportsCount}</h3>
           </div>
         </div>
 
-        {/* Kartu Kendala Aktif */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center space-x-4">
-          <div className="p-4 bg-red-50 text-red-600 rounded-lg">
-            <AlertTriangle size={28} />
+        {/* Kartu 3: Kendala Belum Selesai */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="text-red-600" size={26} />
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-500">Kendala Belum Selesai</p>
-            <h2 className="text-2xl font-bold text-gray-900">{unresolvedIssues}</h2>
+            <p className="text-sm font-medium text-gray-500 mb-1">Kendala Belum Selesai</p>
+            <h3 className="text-3xl font-bold text-gray-900">{unresolvedIssuesCount}</h3>
           </div>
         </div>
+
+        {/* Kartu 4: Proyek Selesai (BARU) */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="text-green-600" size={26} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Proyek Selesai</p>
+            <h3 className="text-3xl font-bold text-gray-900">{completedProjectsCount}</h3>
+          </div>
+        </div>
+
       </div>
 
-      {/* Bagian Proyek Terbaru */}
+      {/* DAFTAR PROYEK TERBARU */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Activity className="text-blue-600" size={20} />
             Proyek Terbaru
           </h2>
-          <Link href="/dashboard/projects" className="text-sm text-blue-600 font-medium hover:underline flex items-center gap-1">
+          <Link href="/dashboard/projects" className="text-blue-600 text-sm font-medium flex items-center gap-1 hover:underline">
             Lihat Semua <ArrowRight size={16} />
           </Link>
         </div>
         
         <div className="divide-y divide-gray-100">
           {recentProjects.length === 0 ? (
-            <div className="p-6 text-center text-gray-500">Belum ada proyek yang ditambahkan.</div>
+            <div className="p-8 text-center text-gray-500 text-sm">
+              Belum ada data proyek.
+            </div>
           ) : (
             recentProjects.map(project => (
-              <div key={project.id} className="p-6 hover:bg-gray-50 transition flex justify-between items-center">
+              <div key={project.id} className="p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-gray-50 transition">
                 <div>
-                  <h3 className="font-semibold text-gray-900 text-lg">{project.title}</h3>
-                  <p className="text-sm text-gray-500 mt-1">{project.location}</p>
+                  <h3 className="font-bold text-gray-900 text-base">{project.title}</h3>
+                  <p className="text-gray-500 text-sm">{project.location}</p>
                 </div>
-                <div className="text-right">
-                  <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+                <div className="sm:text-right">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block mb-2 sm:mb-1 ${
+                    project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                  }`}>
                     {project.status.replace('_', ' ')}
                   </span>
-                  <p className="text-xs text-gray-400 mt-2">
-                    Mulai: {project.startDate.toLocaleDateString('id-ID')}
+                  <p className="text-gray-400 text-xs">
+                    Mulai: {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
               </div>
@@ -97,7 +126,6 @@ export default async function DashboardHome() {
           )}
         </div>
       </div>
-
     </div>
   );
 }
