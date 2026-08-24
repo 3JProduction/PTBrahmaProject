@@ -1,40 +1,11 @@
-'use client';
-
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { handleLogin } from '@/app/actions/auth';
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const formData = new FormData(event.currentTarget);
-      // Ekstrak menjadi teks biasa di sini
-      const email = formData.get('email') as string;
-      const password = formData.get('password') as string;
-
-      // Kirim teks biasa ke server
-      const result = await handleLogin(email, password);
-
-      if (result?.error) {
-        setError(result.error);
-        setIsLoading(false);
-      } else {
-        window.location.href = '/dashboard';
-      }
-    } catch (err) {
-      setError('Terjadi kendala jaringan. Silakan coba lagi.');
-      setIsLoading(false);
-    }
-  }
-
+// Halaman ini sekarang murni Server Component (Tanpa 'use client')
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: { error?: string };
+}) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
@@ -43,21 +14,22 @@ async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
           <p className="text-gray-500 mt-2">Sistem Manajemen Proyek & Laporan</p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center">
-            {error}
+        {/* Munculkan pesan merah jika ada '?error=invalid' di URL */}
+        {searchParams?.error === 'invalid' && (
+          <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center font-medium">
+            Email atau password salah!
           </div>
         )}
 
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form action={handleLogin} className="space-y-5">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Email</label>
             <input
               type="email"
               name="email"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
-              placeholder="pm@bwc.com"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+              placeholder="site@bwc.com"
             />
           </div>
 
@@ -67,17 +39,16 @@ async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
               type="password"
               name="password"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent outline-none transition"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
               placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-700 text-white py-2.5 px-4 rounded-lg hover:bg-blue-800 transition font-medium disabled:bg-blue-400"
+            className="w-full bg-blue-700 text-white py-2.5 px-4 rounded-lg hover:bg-blue-800 transition font-medium"
           >
-            {isLoading ? 'Memeriksa Data...' : 'Masuk ke Dashboard'}
+            Masuk ke Dashboard
           </button>
         </form>
 
