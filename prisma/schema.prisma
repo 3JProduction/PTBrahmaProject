@@ -3,7 +3,6 @@
 // ------------------------------------------------------
 generator client {
   provider   = "prisma-client-js"
-  engineType = "binary"
 }
 
 datasource db {
@@ -16,10 +15,8 @@ datasource db {
 // ENUMS (Pilihan Statis)
 // ------------------------------------------------------
 enum Role {
-  ADMIN_KANTOR
   PROJECT_MANAGER
-  SITE_ENGINEER
-  MANDOR
+  SITE_MANAGER
 }
 
 enum StatusApproval {
