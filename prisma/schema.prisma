@@ -62,6 +62,7 @@ model Project {
   startDate        DateTime
   endDate          DateTime
   status           String            @default("ON_PROGRESS") // ON_PROGRESS, COMPLETED, HOLD
+  progress         Int               @default(0) // TAMBAHKAN BARIS INI (Skala 0-100)
   createdAt        DateTime          @default(now())
   workItems        WorkItem[]
   dailyReports     DailyReport[]

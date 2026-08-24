@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { Briefcase, FileText, AlertTriangle, CheckCircle, Activity, ArrowRight } from 'lucide-react';
 import prisma from '@/lib/prisma';
+import ProgressChart from '@/components/ProgressChart';
 
 export default async function DashboardPage() {
   // 1. Tarik semua data statistik dari database
@@ -29,6 +30,16 @@ export default async function DashboardPage() {
     take: 3,
     orderBy: { createdAt: 'desc' }
   });
+
+  const activeProjectsForChart = await prisma.project.findMany({
+    where: { status: 'ON_PROGRESS' },
+    select: { title: true, progress: true }
+  });
+
+  const chartData = activeProjectsForChart.map(p => ({
+    name: p.title,
+    progress: p.progress
+  }));
 
   return (
     <div className="space-y-8">
@@ -85,6 +96,11 @@ export default async function DashboardPage() {
           </div>
         </div>
 
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Grafik Progres Proyek Aktif</h2>
+          <ProgressChart data={chartData} />
       </div>
 
       {/* DAFTAR PROYEK TERBARU */}

@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
-import { Plus, CheckCircle } from 'lucide-react';
+import { Plus, CheckCircle, Save } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 import { revalidatePath } from 'next/cache';
@@ -14,17 +14,39 @@ export default async function ProjectsPage() {
     orderBy: { createdAt: 'desc' }
   });
 
-  // Fungsi Server Action untuk menandai proyek selesai
+  // Server Action untuk mengupdate persentase progress
+  async function updateProgress(formData: FormData) {
+    'use server';
+    const id = formData.get('id') as string;
+    const progressVal = parseInt(formData.get('progress') as string) || 0;
+    
+    // Batasi nilai antara 0 sampai 100
+    const safeProgress = Math.min(100, Math.max(0, progressVal));
+
+    await prisma.project.update({
+      where: { id },
+      data: { progress: safeProgress }
+    });
+    
+    revalidatePath('/dashboard/projects');
+    revalidatePath('/dashboard'); // Agar grafik di dashboard ikut terupdate
+  }
+
+  // Server Action untuk menandai proyek selesai
   async function completeProject(formData: FormData) {
     'use server';
     const id = formData.get('id') as string;
     
     await prisma.project.update({
       where: { id },
-      data: { status: 'COMPLETED' } // Mengubah status menjadi COMPLETED
+      data: { 
+        status: 'COMPLETED',
+        progress: 100 // Otomatis set 100% jika diselesaikan
+      }
     });
     
     revalidatePath('/dashboard/projects');
+    revalidatePath('/dashboard');
   }
 
   return (
@@ -33,10 +55,9 @@ export default async function ProjectsPage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Data Proyek</h1>
-          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi yang sedang berjalan.</p>
+          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan perbarui persentase progres.</p>
         </div>
         
-        {/* Tombol Tambah Proyek hanya untuk Site Manager */}
         {role === 'SITE_MANAGER' && (
           <Link 
             href="/dashboard/projects/create" 
@@ -51,15 +72,15 @@ export default async function ProjectsPage() {
       {/* TABEL PROYEK */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[600px]">
+          <table className="w-full text-left border-collapse min-w-[750px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
                 <th className="p-4 font-semibold">Nama Proyek</th>
                 <th className="p-4 font-semibold">Lokasi</th>
                 <th className="p-4 font-semibold">Tanggal Mulai</th>
                 <th className="p-4 font-semibold">Status</th>
+                <th className="p-4 font-semibold">Progres (%)</th>
                 
-                {/* Kolom Aksi Khusus Project Manager */}
                 {role === 'OWNER' && (
                   <th className="p-4 font-semibold text-center">Aksi (PM)</th>
                 )}
@@ -68,7 +89,7 @@ export default async function ProjectsPage() {
             <tbody>
               {projects.length === 0 ? (
                 <tr>
-                  <td colSpan={role === 'OWNER' ? 5 : 4} className="p-8 text-center text-gray-500 text-sm">
+                  <td colSpan={role === 'OWNER' ? 6 : 5} className="p-8 text-center text-gray-500 text-sm">
                     Belum ada proyek. Silakan tambah proyek baru.
                   </td>
                 </tr>
@@ -81,7 +102,7 @@ export default async function ProjectsPage() {
                       {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </td>
                     
-                    {/* Badge Status (Warna otomatis berubah jika COMPLETED) */}
+                    {/* Badge Status */}
                     <td className="p-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
                         project.status === 'COMPLETED' 
@@ -91,23 +112,54 @@ export default async function ProjectsPage() {
                         {project.status.replace('_', ' ')}
                       </span>
                     </td>
+
+                    {/* Kolom Angka Progres */}
+                    <td className="p-4 font-semibold text-gray-700">
+                      {project.progress}%
+                    </td>
                     
-                    {/* Tombol Selesaikan Proyek Khusus Project Manager */}
+                    {/* Kolom Aksi Khusus Project Manager */}
                     {role === 'OWNER' && (
                       <td className="p-4 text-center">
-                        {project.status !== 'COMPLETED' && (
-                          <form action={completeProject}>
+                        <div className="flex items-center justify-center gap-3">
+                          
+                          {/* Form Update Angka Progress */}
+                          <form action={updateProgress} className="flex items-center gap-1">
                             <input type="hidden" name="id" value={project.id} />
+                            <input 
+                              type="number" 
+                              name="progress" 
+                              defaultValue={project.progress}
+                              min="0"
+                              max="100"
+                              className="w-16 p-1.5 border border-gray-300 rounded-lg text-center text-xs font-semibold focus:ring-2 focus:ring-blue-500 outline-none"
+                              required
+                            />
                             <button 
                               type="submit" 
-                              className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-200 transition flex items-center justify-center gap-2 mx-auto"
-                              title="Tandai Proyek Selesai"
+                              className="bg-blue-50 text-blue-700 hover:bg-blue-100 p-1.5 rounded-lg transition"
+                              title="Simpan Progres"
                             >
-                              <CheckCircle size={16} />
-                              Selesaikan
+                              <Save size={16} />
                             </button>
                           </form>
-                        )}
+
+                          {/* Tombol Selesaikan */}
+                          {project.status !== 'COMPLETED' && (
+                            <form action={completeProject}>
+                              <input type="hidden" name="id" value={project.id} />
+                              <button 
+                                type="submit" 
+                                className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-200 transition flex items-center gap-1"
+                                title="Tandai Proyek Selesai (100%)"
+                              >
+                                <CheckCircle size={14} />
+                                Selesai
+                              </button>
+                            </form>
+                          )}
+
+                        </div>
                       </td>
                     )}
                     
