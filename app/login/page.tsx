@@ -1,6 +1,5 @@
 import { handleLogin } from '@/app/actions/auth';
 
-// Halaman ini sekarang murni Server Component (Tanpa 'use client')
 export default function LoginPage({
   searchParams,
 }: {
@@ -14,7 +13,6 @@ export default function LoginPage({
           <p className="text-gray-500 mt-2">Sistem Manajemen Proyek & Laporan</p>
         </div>
 
-        {/* Munculkan pesan merah jika ada '?error=invalid' di URL */}
         {searchParams?.error === 'invalid' && (
           <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center font-medium">
             Email atau password salah!
@@ -29,7 +27,6 @@ export default function LoginPage({
               name="email"
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
-              placeholder="site@bwc.com"
             />
           </div>
 
@@ -40,7 +37,6 @@ export default function LoginPage({
               name="password"
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
-              placeholder="••••••••"
             />
           </div>
 
