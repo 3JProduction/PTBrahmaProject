@@ -3,6 +3,9 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { logout } from '@/app/actions/auth';
 
+// 1. TAMBAHKAN BARIS SAKTI INI: Memaksa Vercel mematikan sistem Cache untuk halaman ini
+export const dynamic = 'force-dynamic'; 
+
 export default function DashboardLayout({
   children,
 }: {
@@ -22,6 +25,8 @@ export default function DashboardLayout({
       <div className="ml-64 flex-1 p-8">
         {children}
       </div>
+      
+      {/* Tombol Logout */}
       <div className="p-4 border-t border-gray-200 mt-auto">
         <div className="text-sm text-gray-500 mb-2">
           Login sebagai:<br/>
