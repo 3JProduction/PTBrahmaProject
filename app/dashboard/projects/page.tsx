@@ -17,7 +17,7 @@ export default async function ProjectsPage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Data Proyek</h1>
-          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan perbarui status atau progres.</p>
+          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan perbarui persentase progres.</p>
         </div>
         {role === 'SITE_MANAGER' && (
           <Link 
@@ -51,51 +51,88 @@ export default async function ProjectsPage() {
                 
                 <div className="flex flex-col space-y-1.5 text-sm text-gray-600 border-t border-gray-100 pt-2">
                   <div className="flex items-start gap-2">
-                    <span className="font-semibold text-gray-700 w-24 shrink-0">Lokasi:</span>
+                    <span className="font-semibold text-gray-700 w-28 shrink-0">Lokasi:</span>
                     <span>{project.location}</span>
                   </div>
                   <div className="flex items-start gap-2">
-                    <span className="font-semibold text-gray-700 w-24 shrink-0">Mulai:</span>
+                    <span className="font-semibold text-gray-700 w-28 shrink-0">Mulai:</span>
                     <span>{project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </div>
+                  <div className="flex items-center gap-2 pt-1">
+                    <span className="font-semibold text-gray-700 w-28 shrink-0">Proses Saat Ini:</span>
+                    <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
                   </div>
                 </div>
 
-                {/* Tombol Aksi Khusus Project Manager (Owner) di Mobile Card */}
-                {role === 'OWNER' && (
-                  <div className="pt-2 border-t border-gray-100 flex items-center justify-end gap-2">
-                    {project.status !== 'COMPLETED' ? (
-                      <form action={async () => {
-                        'use server';
-                        await prisma.project.update({
-                          where: { id: project.id },
-                          data: { status: 'COMPLETED' }
-                        });
-                      }}>
-                        <button 
-                          type="submit"
-                          className="bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-green-700 transition shadow-sm"
-                        >
-                          Selesaikan Proyek
-                        </button>
-                      </form>
-                    ) : (
-                      <form action={async () => {
-                        'use server';
-                        await prisma.project.update({
-                          where: { id: project.id },
-                          data: { status: 'ON_PROGRESS' }
-                        });
-                      }}>
-                        <button 
-                          type="submit"
-                          className="bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-700 transition shadow-sm"
-                        >
-                          Ubah ke On Progress
-                        </button>
-                      </form>
-                    )}
-                  </div>
-                )}
+                {/* Form Update Progres & Status di Mobile Card */}
+                <div className="pt-3 border-t border-gray-100 flex flex-col space-y-2">
+                  <form action={async (formData) => {
+                    'use server';
+                    const newProgress = Number(formData.get('progress'));
+                    await prisma.project.update({
+                      where: { id: project.id },
+                      data: { 
+                        progress: newProgress,
+                        status: newProgress === 100 ? 'COMPLETED' : project.status 
+                      }
+                    });
+                  }} className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5">
+                      <input 
+                        type="number" 
+                        name="progress" 
+                        defaultValue={project.progress ?? 0} 
+                        min="0" 
+                        max="100"
+                        className="w-16 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      />
+                      <span className="text-sm font-semibold text-gray-600">%</span>
+                    </div>
+                    <button 
+                      type="submit" 
+                      className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm"
+                    >
+                      Simpan Progres
+                    </button>
+                  </form>
+
+                  {/* Tombol Selesaikan Proyek khusus PM */}
+                  {role === 'OWNER' && (
+                    <div className="flex justify-end pt-2">
+                      {project.status !== 'COMPLETED' ? (
+                        <form action={async () => {
+                          'use server';
+                          await prisma.project.update({
+                            where: { id: project.id },
+                            data: { status: 'COMPLETED', progress: 100 }
+                          });
+                        }}>
+                          <button 
+                            type="submit"
+                            className="bg-green-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg hover:bg-green-700 transition shadow-sm"
+                          >
+                            Selesaikan Proyek
+                          </button>
+                        </form>
+                      ) : (
+                        <form action={async () => {
+                          'use server';
+                          await prisma.project.update({
+                            where: { id: project.id },
+                            data: { status: 'ON_PROGRESS' }
+                          });
+                        }}>
+                          <button 
+                            type="submit"
+                            className="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg hover:bg-amber-700 transition shadow-sm"
+                          >
+                            Ubah ke On Progress
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -108,8 +145,9 @@ export default async function ProjectsPage() {
                   <th className="p-4 font-semibold">Nama Proyek</th>
                   <th className="p-4 font-semibold">Lokasi</th>
                   <th className="p-4 font-semibold">Tanggal Mulai</th>
+                  <th className="p-4 font-semibold">Progres</th>
                   <th className="p-4 font-semibold">Status</th>
-                  {role === 'OWNER' && <th className="p-4 font-semibold text-right">Aksi</th>}
+                  <th className="p-4 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody>
@@ -121,20 +159,46 @@ export default async function ProjectsPage() {
                       {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </td>
                     <td className="p-4">
+                      <form action={async (formData) => {
+                        'use server';
+                        const newProgress = Number(formData.get('progress'));
+                        await prisma.project.update({
+                          where: { id: project.id },
+                          data: { 
+                            progress: newProgress,
+                            status: newProgress === 100 ? 'COMPLETED' : project.status 
+                          }
+                        });
+                      }} className="flex items-center gap-2">
+                        <input 
+                          type="number" 
+                          name="progress" 
+                          defaultValue={project.progress ?? 0} 
+                          min="0" 
+                          max="100"
+                          className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
+                        />
+                        <span className="font-semibold">%</span>
+                        <button type="submit" className="bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">
+                          Simpan
+                        </button>
+                      </form>
+                    </td>
+                    <td className="p-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
                         project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
                       }`}>
                         {project.status.replace('_', ' ')}
                       </span>
                     </td>
-                    {role === 'OWNER' && (
-                      <td className="p-4 text-right">
-                        {project.status !== 'COMPLETED' ? (
+                    <td className="p-4 text-right">
+                      {role === 'OWNER' && (
+                        project.status !== 'COMPLETED' ? (
                           <form action={async () => {
                             'use server';
                             await prisma.project.update({
                               where: { id: project.id },
-                              data: { status: 'COMPLETED' }
+                              data: { status: 'COMPLETED', progress: 100 }
                             });
                           }}>
                             <button 
@@ -159,9 +223,9 @@ export default async function ProjectsPage() {
                               Ubah ke On Progress
                             </button>
                           </form>
-                        )}
-                      </td>
-                    )}
+                        )
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>
