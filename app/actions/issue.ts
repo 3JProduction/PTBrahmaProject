@@ -10,20 +10,15 @@ export async function createIssue(formData: FormData) {
   const description = formData.get('description') as string;
   const severity = formData.get('severity') as 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 
-  // Tarik data user default (sebagai simulasi pelapor)
-  // const defaultUser = await prisma.user.findUnique({
-  //   where: { email: 'admin@bwc.com' },
-  // });
-
-  // if (!defaultUser) throw new Error("User tidak ditemukan");
+  // Menggunakan site@bwat.com dan role SITE_MANAGER untuk pelapor di lapangan
   const defaultUser = await prisma.user.upsert({
-  where: { email: 'admin@bwc.com' },
-  update: {},
-  create: {
-    name: 'Admin BWC',
-    email: 'admin@bwc.com',
-    role: 'ADMIN_KANTOR',
-   },
+    where: { email: 'site@bwat.com' },
+    update: {},
+    create: {
+      name: 'Site Manager BWAT',
+      email: 'site@bwat.com',
+      role: 'SITE_MANAGER',
+    },
   });
 
   // Simpan laporan kendala ke database
