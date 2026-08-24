@@ -2,7 +2,7 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { revalidatePath } from 'next/cache'; // Senjata penghancur cache
+import { revalidatePath } from 'next/cache';
 
 export async function handleLoginAction(formData: FormData) {
   const email = formData.get('email') as string;
@@ -13,24 +13,19 @@ export async function handleLoginAction(formData: FormData) {
 
   let role = '';
   
-  if (cleanEmail === 'pm@bwc.com' && cleanPass === 'pm123') {
+  // Email berubah menjadi @bwat.com
+  if (cleanEmail === 'pm@bwat.com' && cleanPass === 'pm123') {
     role = 'OWNER';
-  } else if (cleanEmail === 'site@bwc.com' && cleanPass === 'site123') {
+  } else if (cleanEmail === 'site@bwat.com' && cleanPass === 'site123') {
     role = 'SITE_MANAGER';
   }
 
-  // Jika gagal, kembalikan pesan error tanpa memindahkan halaman
   if (!role) {
     return { error: 'Email atau password salah!' };
   }
 
-  // Jika sukses, cetak tiketnya
   cookies().set('userRole', role, { path: '/' });
-
-  // 1. Hapus ingatan "ditolak" dari halaman dashboard
   revalidatePath('/dashboard', 'layout');
-  
-  // 2. Langsung pindahkan dari sisi Server (Browser pasti menurut)
   redirect('/dashboard');
 }
 

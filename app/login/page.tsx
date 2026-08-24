@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-blue-700">PT BWC</h2>
+          <h2 className="text-3xl font-bold text-blue-700">PT BWAT</h2>
           <p className="text-gray-500 mt-2">Sistem Manajemen Proyek & Laporan</p>
         </div>
 
@@ -77,14 +77,14 @@ export default function LoginPage() {
             <div>
               <p className="text-blue-700 font-medium">1. Project Manager (Lihat Saja)</p>
               <ul className="list-disc list-inside text-blue-600 ml-1">
-                <li>Email: <strong>pm@bwc.com</strong></li>
+                <li>Email: <strong>pm@bwat.com</strong></li>
                 <li>Pass: <strong>pm123</strong></li>
               </ul>
             </div>
             <div>
               <p className="text-blue-700 font-medium">2. Site Manager (Bisa Input)</p>
               <ul className="list-disc list-inside text-blue-600 ml-1">
-                <li>Email: <strong>site@bwc.com</strong></li>
+                <li>Email: <strong>site@bwat.com</strong></li>
                 <li>Pass: <strong>site123</strong></li>
               </ul>
             </div>
