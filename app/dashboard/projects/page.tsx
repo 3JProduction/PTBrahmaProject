@@ -17,7 +17,7 @@ export default async function ProjectsPage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Data Proyek</h1>
-          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan perbarui persentase progres.</p>
+          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan pantau persentase progres.</p>
         </div>
         {role === 'SITE_MANAGER' && (
           <Link 
@@ -64,40 +64,39 @@ export default async function ProjectsPage() {
                   </div>
                 </div>
 
-                {/* Form Update Progres & Status di Mobile Card */}
-                <div className="pt-3 border-t border-gray-100 flex flex-col space-y-2">
-                  <form action={async (formData) => {
-                    'use server';
-                    const newProgress = Number(formData.get('progress'));
-                    await prisma.project.update({
-                      where: { id: project.id },
-                      data: { 
-                        progress: newProgress,
-                        status: newProgress === 100 ? 'COMPLETED' : project.status 
-                      }
-                    });
-                  }} className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5">
-                      <input 
-                        type="number" 
-                        name="progress" 
-                        defaultValue={project.progress ?? 0} 
-                        min="0" 
-                        max="100"
-                        className="w-16 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      />
-                      <span className="text-sm font-semibold text-gray-600">%</span>
-                    </div>
-                    <button 
-                      type="submit" 
-                      className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm"
-                    >
-                      Simpan Progres
-                    </button>
-                  </form>
+                {/* Form Update Progres & Status HANYA UNTUK PROJECT MANAGER (OWNER) */}
+                {role === 'OWNER' && (
+                  <div className="pt-3 border-t border-gray-100 flex flex-col space-y-2">
+                    <form action={async (formData) => {
+                      'use server';
+                      const newProgress = Number(formData.get('progress'));
+                      await prisma.project.update({
+                        where: { id: project.id },
+                        data: { 
+                          progress: newProgress,
+                          status: newProgress === 100 ? 'COMPLETED' : project.status 
+                        }
+                      });
+                    }} className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <input 
+                          type="number" 
+                          name="progress" 
+                          defaultValue={project.progress ?? 0} 
+                          min="0" 
+                          max="100"
+                          className="w-16 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                        />
+                        <span className="text-sm font-semibold text-gray-600">%</span>
+                      </div>
+                      <button 
+                        type="submit" 
+                        className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm"
+                      >
+                        Simpan Progres
+                      </button>
+                    </form>
 
-                  {/* Tombol Selesaikan Proyek khusus PM */}
-                  {role === 'OWNER' && (
                     <div className="flex justify-end pt-2">
                       {project.status !== 'COMPLETED' ? (
                         <form action={async () => {
@@ -131,13 +130,13 @@ export default async function ProjectsPage() {
                         </form>
                       )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </div>
 
-          {/* 💻 TAMPILAN DESKTOP: Model Tabel (Status di Kiri, Progres di Kanan) */}
+          {/* 💻 TAMPILAN DESKTOP: Model Tabel */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -147,7 +146,7 @@ export default async function ProjectsPage() {
                   <th className="p-4 font-semibold">Tanggal Mulai</th>
                   <th className="p-4 font-semibold">Status</th>
                   <th className="p-4 font-semibold">Progres</th>
-                  <th className="p-4 font-semibold text-right">Aksi</th>
+                  {role === 'OWNER' && <th className="p-4 font-semibold text-right">Aksi</th>}
                 </tr>
               </thead>
               <tbody>
@@ -158,7 +157,6 @@ export default async function ProjectsPage() {
                     <td className="p-4 text-gray-600">
                       {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </td>
-                    {/* Kolom Status (Dipindah ke kiri) */}
                     <td className="p-4">
                       <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
                         project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
@@ -166,37 +164,39 @@ export default async function ProjectsPage() {
                         {project.status.replace('_', ' ')}
                       </span>
                     </td>
-                    {/* Kolom Progres (Dipindah ke kanan) */}
                     <td className="p-4">
-                      <form action={async (formData) => {
-                        'use server';
-                        const newProgress = Number(formData.get('progress'));
-                        await prisma.project.update({
-                          where: { id: project.id },
-                          data: { 
-                            progress: newProgress,
-                            status: newProgress === 100 ? 'COMPLETED' : project.status 
-                          }
-                        });
-                      }} className="flex items-center gap-2">
-                        <input 
-                          type="number" 
-                          name="progress" 
-                          defaultValue={project.progress ?? 0} 
-                          min="0" 
-                          max="100"
-                          className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
-                        />
-                        <span className="font-semibold">%</span>
-                        <button type="submit" className="bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">
-                          Simpan
-                        </button>
-                      </form>
+                      {role === 'OWNER' ? (
+                        <form action={async (formData) => {
+                          'use server';
+                          const newProgress = Number(formData.get('progress'));
+                          await prisma.project.update({
+                            where: { id: project.id },
+                            data: { 
+                              progress: newProgress,
+                              status: newProgress === 100 ? 'COMPLETED' : project.status 
+                            }
+                          });
+                        }} className="flex items-center gap-2">
+                          <input 
+                            type="number" 
+                            name="progress" 
+                            defaultValue={project.progress ?? 0} 
+                            min="0" 
+                            max="100"
+                            className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
+                          />
+                          <span className="font-semibold">%</span>
+                          <button type="submit" className="bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">
+                            Simpan
+                          </button>
+                        </form>
+                      ) : (
+                        <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
+                      )}
                     </td>
-                    {/* Kolom Aksi */}
-                    <td className="p-4 text-right">
-                      {role === 'OWNER' && (
-                        project.status !== 'COMPLETED' ? (
+                    {role === 'OWNER' && (
+                      <td className="p-4 text-right">
+                        {project.status !== 'COMPLETED' ? (
                           <form action={async () => {
                             'use server';
                             await prisma.project.update({
@@ -226,9 +226,9 @@ export default async function ProjectsPage() {
                               Ubah ke On Progress
                             </button>
                           </form>
-                        )
-                      )}
-                    </td>
+                        )}
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
