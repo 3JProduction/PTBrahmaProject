@@ -22,7 +22,7 @@ export default async function DashboardHome() {
     <div className="space-y-8">
       {/* Bagian Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Selamat Datang di Dashboard BWC</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Selamat Datang di Dashboard BWAT</h1>
         <p className="text-gray-500 mt-1">Ringkasan aktivitas dan status proyek konstruksi Anda hari ini.</p>
       </div>
 
