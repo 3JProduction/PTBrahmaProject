@@ -1,13 +1,17 @@
 export const dynamic = 'force-dynamic';
 
-import { Plus, Edit, CheckCircle } from 'lucide-react'; 
+// FIX 1: Import ikon dirapikan agar tidak ada yang ganda
+import { Plus, CheckCircle, Eye } from 'lucide-react'; 
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
-import { cookies } from 'next/headers'; // FIX 1: Import cookies ditambahkan
+import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 
 export default async function ReportsPage() {
   const role = cookies().get('userRole')?.value;
+  
+  // FIX 2: Kita pastikan kolom Aksi muncul untuk Project Manager
+  const isPM = role === 'PROJECT_MANAGER' || role === 'OWNER';
   
   // Ambil data laporan sekaligus menarik nama proyek dan nama pelapor
   const reports = await prisma.dailyReport.findMany({
@@ -22,7 +26,6 @@ export default async function ReportsPage() {
     'use server';
     const id = formData.get('id') as string;
     
-    // FIX 4: Disamakan menjadi dailyReport sesuai nama model findMany
     await prisma.dailyReport.update({ 
       where: { id },
       data: { status: 'APPROVED' }
@@ -58,7 +61,8 @@ export default async function ReportsPage() {
                 <th className="p-4 font-semibold">Cuaca</th>
                 <th className="p-4 font-semibold">Pelapor</th>
                 <th className="p-4 font-semibold">Status</th>
-                {role === 'OWNER' && (
+                {/* Kolom Aksi Khusus PM */}
+                {isPM && (
                   <th className="p-4 font-semibold text-center">Aksi (PM)</th>
                 )}
               </tr>
@@ -66,12 +70,11 @@ export default async function ReportsPage() {
             <tbody>
               {reports.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500 text-sm">
+                  <td colSpan={isPM ? 6 : 5} className="p-8 text-center text-gray-500 text-sm">
                     Belum ada laporan harian.
                   </td>
                 </tr>
               ) : (
-                // FIX 3: Menghilangkan kurawal {} ekstra di sekitar reports.map
                 reports.map((report) => (
                   <tr key={report.id} className="border-b border-gray-100 hover:bg-gray-50 transition text-sm">
                     <td className="p-4 font-medium text-gray-900">
@@ -90,15 +93,18 @@ export default async function ReportsPage() {
                       </span>
                     </td>
                     
-                    {role === 'OWNER' && (
+                    {/* Tombol Aksi Khusus PM */}
+                    {isPM && (
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-3">
+                          
+                          {/* FIX 3: Tombol "Edit" diubah jadi "Lihat Detail" (Ikon Mata) */}
                           <Link 
-                            href={`/dashboard/reports/${report.id}/edit`} 
+                            href={`/dashboard/reports/${report.id}`} 
                             className="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition"
-                            title="Edit Laporan"
+                            title="Lihat Detail & Catatan"
                           >
-                            <Edit size={18} />
+                            <Eye size={18} />
                           </Link>
                           
                           {report.status !== 'APPROVED' && (

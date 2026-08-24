@@ -3,12 +3,12 @@ export const dynamic = 'force-dynamic';
 import prisma from '@/lib/prisma';
 import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, FileText, User, Calendar, MapPin, Cloud } from 'lucide-react';
+import { ArrowLeft, CheckCircle, FileText, User, Calendar, MapPin, AlertTriangle } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 
-export default async function ReportDetailPage({ params }: { params: { id: string } }) {
-  // Ambil detail laporan beserta nama proyek dan pelapornya
-  const report = await prisma.dailyReport.findUnique({
+export default async function IssueDetailPage({ params }: { params: { id: string } }) {
+  // Ambil detail kendala beserta nama proyek dan pelapornya
+  const issue = await prisma.issue.findUnique({
     where: { id: params.id },
     include: {
       project: true,
@@ -16,18 +16,17 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
     }
   });
 
-  // Jika ID laporan tidak ditemukan
-  if (!report) notFound();
+  if (!issue) notFound();
 
-  // Fungsi Server Action untuk PM menyetujui laporan
-  async function approveReport() {
+  // Fungsi Server Action untuk menandai kendala telah diselesaikan
+  async function resolveIssue() {
     'use server';
-    await prisma.dailyReport.update({
+    await prisma.issue.update({
       where: { id: params.id },
-      data: { status: 'APPROVED' }
+      data: { isResolved: true }
     });
-    revalidatePath('/dashboard/reports');
-    redirect('/dashboard/reports'); // Kembali ke tabel laporan setelah sukses
+    revalidatePath('/dashboard/issues');
+    redirect('/dashboard/issues');
   }
 
   return (
@@ -35,19 +34,19 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
       {/* Header Halaman */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/dashboard/reports" className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition">
+          <Link href="/dashboard/issues" className="p-2 text-gray-500 hover:bg-gray-100 rounded-full transition">
             <ArrowLeft size={24} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Detail Laporan Harian</h1>
-            <p className="text-gray-500 text-sm">Review detail pekerjaan dan progres lapangan.</p>
+            <h1 className="text-2xl font-bold text-gray-900">Detail Kendala (Issue)</h1>
+            <p className="text-gray-500 text-sm">Review detail masalah lapangan dan tindak lanjuti.</p>
           </div>
         </div>
         
         <span className={`px-4 py-1.5 rounded-full text-sm font-bold tracking-wide ${
-          report.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+          issue.isResolved ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
         }`}>
-          {report.status}
+          {issue.isResolved ? 'TERSELESAIKAN' : 'BELUM SELESAI'}
         </span>
       </div>
 
@@ -60,57 +59,58 @@ export default async function ReportDetailPage({ params }: { params: { id: strin
             <p className="text-xs font-medium text-gray-500 uppercase mb-1">Proyek</p>
             <div className="flex items-center gap-2 text-gray-900 font-semibold">
               <MapPin size={16} className="text-blue-600" />
-              {report.project.title}
+              {issue.project.title}
             </div>
-            <p className="text-sm text-gray-500 ml-6">{report.project.location}</p>
+            <p className="text-sm text-gray-500 ml-6">{issue.project.location}</p>
           </div>
           
           <div>
             <p className="text-xs font-medium text-gray-500 uppercase mb-1">Pelapor</p>
             <div className="flex items-center gap-2 text-gray-900 font-medium">
               <User size={16} className="text-blue-600" />
-              {report.reporter.name}
+              {issue.reporter.name}
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-medium text-gray-500 uppercase mb-1">Tanggal Laporan</p>
+            <p className="text-xs font-medium text-gray-500 uppercase mb-1">Tanggal Dilaporkan</p>
             <div className="flex items-center gap-2 text-gray-900 font-medium">
               <Calendar size={16} className="text-blue-600" />
-              {report.date.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+              {issue.createdAt.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </div>
           </div>
 
           <div>
-            <p className="text-xs font-medium text-gray-500 uppercase mb-1">Kondisi Cuaca</p>
+            <p className="text-xs font-medium text-gray-500 uppercase mb-1">Tingkat Keparahan</p>
             <div className="flex items-center gap-2 text-gray-900 font-medium">
-              <Cloud size={16} className="text-blue-600" />
-              {report.weather}
+              <AlertTriangle size={16} className={`
+                ${issue.severity === 'CRITICAL' ? 'text-red-600' : 
+                  issue.severity === 'HIGH' ? 'text-orange-500' : 
+                  issue.severity === 'MEDIUM' ? 'text-yellow-500' : 'text-blue-500'}
+              `} />
+              <span className="font-bold">{issue.severity}</span>
             </div>
           </div>
         </div>
 
-        {/* Kotak Catatan (Teks Panjang) */}
+        {/* Kotak Deskripsi */}
         <div className="p-6">
-          <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2 mb-3">
-            <FileText size={18} className="text-blue-600" />
-            Catatan Progres Lapangan
-          </h3>
-          <div className="bg-white p-4 rounded-lg border border-gray-200 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed min-h-[150px]">
-            {report.notes || 'Tidak ada catatan progres yang dilampirkan oleh Site Manager.'}
+          <h3 className="text-lg font-bold text-gray-900 mb-2">{issue.title}</h3>
+          <div className="bg-white p-4 rounded-lg border border-gray-200 text-gray-800 text-sm whitespace-pre-wrap leading-relaxed min-h-[120px]">
+            {issue.description || 'Tidak ada deskripsi detail yang dilampirkan.'}
           </div>
         </div>
 
-        {/* Tombol Setujui Khusus PM */}
-        {report.status !== 'APPROVED' && (
+        {/* Tombol Penyelesaian Khusus PM */}
+        {!issue.isResolved && (
           <div className="p-6 border-t border-gray-100 bg-gray-50">
-            <form action={approveReport}>
+            <form action={resolveIssue}>
               <button 
                 type="submit"
                 className="w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2 shadow-sm"
               >
                 <CheckCircle size={20} />
-                Tandai Sudah Direview & Setujui Laporan
+                Tandai Masalah Telah Diselesaikan
               </button>
             </form>
           </div>

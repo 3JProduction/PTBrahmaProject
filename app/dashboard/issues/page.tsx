@@ -1,14 +1,16 @@
 export const dynamic = 'force-dynamic';
 
-import Link from 'next/link';
-import { AlertTriangle, Plus, CheckSquare } from 'lucide-react';
-import { cookies } from 'next/headers';
+import { Plus, CheckCircle, Eye, AlertTriangle } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
+import Link from 'next/link';
+import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 
 export default async function IssuesPage() {
   const role = cookies().get('userRole')?.value;
+  const isPM = role === 'PROJECT_MANAGER' || role === 'OWNER';
 
+  // Tarik data kendala beserta nama proyek dan pelapornya
   const issues = await prisma.issue.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
@@ -17,23 +19,13 @@ export default async function IssuesPage() {
     },
   });
 
-  // Fungsi pembantu untuk warna tingkat keparahan
-  const getSeverityBadge = (severity: string) => {
-    switch (severity) {
-      case 'CRITICAL': return 'bg-red-100 text-red-700 border border-red-200';
-      case 'HIGH': return 'bg-orange-100 text-orange-700 border border-orange-200';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-700 border border-yellow-200';
-      default: return 'bg-gray-100 text-gray-700 border border-gray-200';
-    }
-  };
-
-  // Fungsi Server Action untuk ACC Kendala Selesai
-  async function accIssue(formData: FormData) {
+  async function resolveIssue(formData: FormData) {
     'use server';
     const id = formData.get('id') as string;
-    await prisma.issue.update({ 
+
+    await prisma.issue.update({
       where: { id },
-      data: { isResolved: true } 
+      data: { isResolved: true }
     });
     revalidatePath('/dashboard/issues');
   }
@@ -48,8 +40,6 @@ export default async function IssuesPage() {
           </h1>
           <p className="text-sm sm:text-base text-gray-500">Pantau dan selesaikan kendala yang terjadi di lapangan.</p>
         </div>
-        
-        {/* Tombol lapor hanya untuk Site Manager */}
         {role === 'SITE_MANAGER' && (
           <Link 
             href="/dashboard/issues/create" 
@@ -63,7 +53,7 @@ export default async function IssuesPage() {
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse min-w-[700px]">
+          <table className="w-full text-left border-collapse min-w-[800px]">
             <thead>
               <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
                 <th className="p-4 font-semibold">Judul Kendala</th>
@@ -71,9 +61,7 @@ export default async function IssuesPage() {
                 <th className="p-4 font-semibold">Keparahan</th>
                 <th className="p-4 font-semibold">Pelapor</th>
                 <th className="p-4 font-semibold">Status</th>
-                
-                {/* Kolom Aksi Khusus Project Manager */}
-                {role === 'OWNER' && (
+                {isPM && (
                   <th className="p-4 font-semibold text-center">Penyelesaian</th>
                 )}
               </tr>
@@ -81,8 +69,8 @@ export default async function IssuesPage() {
             <tbody>
               {issues.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="p-8 text-center text-gray-500 text-sm">
-                    Semua proyek berjalan lancar. Tidak ada kendala aktif.
+                  <td colSpan={isPM ? 6 : 5} className="p-8 text-center text-gray-500 text-sm">
+                    Belum ada kendala yang dilaporkan.
                   </td>
                 </tr>
               ) : (
@@ -91,7 +79,12 @@ export default async function IssuesPage() {
                     <td className="p-4 font-medium text-gray-900">{issue.title}</td>
                     <td className="p-4 text-blue-700 font-medium">{issue.project.title}</td>
                     <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${getSeverityBadge(issue.severity)}`}>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
+                        issue.severity === 'CRITICAL' ? 'bg-red-100 text-red-700' : 
+                        issue.severity === 'HIGH' ? 'bg-orange-100 text-orange-700' : 
+                        issue.severity === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' : 
+                        'bg-blue-100 text-blue-700'
+                      }`}>
                         {issue.severity}
                       </span>
                     </td>
@@ -104,25 +97,35 @@ export default async function IssuesPage() {
                       </span>
                     </td>
                     
-                    {/* Tombol ACC Selesai Khusus Project Manager */}
-                    {role === 'OWNER' && (
+                    {/* Kolom Aksi Khusus PM */}
+                    {isPM && (
                       <td className="p-4 text-center">
-                        {!issue.isResolved && (
-                          <form action={accIssue}>
-                            <input type="hidden" name="id" value={issue.id} />
-                            <button 
-                              type="submit" 
-                              className="bg-green-100 text-green-700 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-green-200 transition flex items-center justify-center gap-2 mx-auto"
-                              title="Tandai Isu Telah Diselesaikan"
-                            >
-                              <CheckSquare size={16} />
-                              ACC Selesai
-                            </button>
-                          </form>
-                        )}
+                        <div className="flex items-center justify-center gap-2">
+                          <Link 
+                            href={`/dashboard/issues/${issue.id}`} 
+                            className="flex items-center gap-1 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition border border-transparent hover:border-blue-200"
+                            title="Lihat Detail Issue"
+                          >
+                            <Eye size={16} />
+                            <span className="text-xs font-semibold">Detail</span>
+                          </Link>
+                          
+                          {!issue.isResolved && (
+                            <form action={resolveIssue}>
+                              <input type="hidden" name="id" value={issue.id} />
+                              <button 
+                                type="submit" 
+                                className="flex items-center gap-1 text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition border border-transparent hover:border-green-200"
+                                title="ACC Selesai Cepat"
+                              >
+                                <CheckCircle size={16} />
+                                <span className="text-xs font-semibold">Selesai</span>
+                              </button>
+                            </form>
+                          )}
+                        </div>
                       </td>
                     )}
-                    
                   </tr>
                 ))
               )}
