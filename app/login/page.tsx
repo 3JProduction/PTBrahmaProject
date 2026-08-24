@@ -1,32 +1,28 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { handleLoginAction } from '@/app/actions/auth';
 
 export default function LoginPage() {
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  
+  // useTransition adalah standar Next.js untuk mencegah layar membeku
+  const [isPending, startTransition] = useTransition();
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setIsLoading(true);
     setError('');
 
-    try {
-      const formData = new FormData(event.currentTarget);
-      const result = await handleLoginAction(formData);
+    const formData = new FormData(event.currentTarget);
 
+    startTransition(async () => {
+      const result = await handleLoginAction(formData);
+      // Jika ada error (password salah), tampilkan pesannya
       if (result?.error) {
-        setError(result.error); // Munculkan tulisan merah
-        setIsLoading(false);
-      } else if (result?.success) {
-        // SUKSES: Paksa pindah halaman fisik
-        window.location.href = '/dashboard';
+        setError(result.error);
       }
-    } catch (err) {
-      setError('Terjadi kesalahan jaringan.');
-      setIsLoading(false);
-    }
+      // Jika sukses, server akan mengurus perpindahan halamannya secara otomatis
+    });
   }
 
   return (
@@ -37,7 +33,6 @@ export default function LoginPage() {
           <p className="text-gray-500 mt-2">Sistem Manajemen Proyek & Laporan</p>
         </div>
 
-        {/* Kotak Error Merah */}
         {error && (
           <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 text-center font-medium">
             {error}
@@ -51,8 +46,7 @@ export default function LoginPage() {
               type="email"
               name="email"
               required
-              defaultValue=""
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition"
               placeholder="Ketik email..."
             />
           </div>
@@ -63,18 +57,17 @@ export default function LoginPage() {
               type="password"
               name="password"
               required
-              defaultValue=""
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none transition"
               placeholder="Ketik password..."
             />
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-700 text-white py-2.5 px-4 rounded-lg hover:bg-blue-800 transition font-medium disabled:bg-blue-400"
+            disabled={isPending}
+            className="w-full bg-blue-700 text-white py-2.5 px-4 rounded-lg hover:bg-blue-800 transition font-medium disabled:bg-blue-400 disabled:cursor-not-allowed"
           >
-            {isLoading ? 'Memeriksa Data...' : 'Masuk ke Dashboard'}
+            {isPending ? 'Memeriksa Data...' : 'Masuk ke Dashboard'}
           </button>
         </form>
 
