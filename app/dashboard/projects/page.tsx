@@ -137,7 +137,7 @@ export default async function ProjectsPage() {
             ))}
           </div>
 
-          {/* 💻 TAMPILAN DESKTOP: Model Tabel Asli */}
+          {/* 💻 TAMPILAN DESKTOP: Model Tabel (Status di Kiri, Progres di Kanan) */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -145,8 +145,8 @@ export default async function ProjectsPage() {
                   <th className="p-4 font-semibold">Nama Proyek</th>
                   <th className="p-4 font-semibold">Lokasi</th>
                   <th className="p-4 font-semibold">Tanggal Mulai</th>
-                  <th className="p-4 font-semibold">Progres</th>
                   <th className="p-4 font-semibold">Status</th>
+                  <th className="p-4 font-semibold">Progres</th>
                   <th className="p-4 font-semibold text-right">Aksi</th>
                 </tr>
               </thead>
@@ -158,6 +158,15 @@ export default async function ProjectsPage() {
                     <td className="p-4 text-gray-600">
                       {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </td>
+                    {/* Kolom Status (Dipindah ke kiri) */}
+                    <td className="p-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
+                        project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
+                        {project.status.replace('_', ' ')}
+                      </span>
+                    </td>
+                    {/* Kolom Progres (Dipindah ke kanan) */}
                     <td className="p-4">
                       <form action={async (formData) => {
                         'use server';
@@ -184,13 +193,7 @@ export default async function ProjectsPage() {
                         </button>
                       </form>
                     </td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
-                        project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {project.status.replace('_', ' ')}
-                      </span>
-                    </td>
+                    {/* Kolom Aksi */}
                     <td className="p-4 text-right">
                       {role === 'OWNER' && (
                         project.status !== 'COMPLETED' ? (
