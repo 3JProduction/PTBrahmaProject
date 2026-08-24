@@ -3,19 +3,19 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, Briefcase, FileText, AlertCircle, Settings, LogOut, Menu, X } from 'lucide-react';
+import { Home, Briefcase, FileText, AlertCircle, LogOut, Menu, X } from 'lucide-react';
 import { logout } from '@/app/actions/auth';
 
 export default function Sidebar({ role }: { role: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
+  // Menu Settings sudah dihapus dari daftar ini
   const navItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/projects', label: 'Data Proyek', icon: Briefcase },
     { href: '/dashboard/reports', label: 'Laporan Harian', icon: FileText },
     { href: '/dashboard/issues', label: 'Issue Tracking', icon: AlertCircle },
-    { href: '/dashboard/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -106,7 +106,7 @@ export default function Sidebar({ role }: { role: string }) {
               type="submit" 
               className="w-full flex items-center gap-2 px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg font-medium text-sm transition"
             >
-              <LogOut size= {18} />
+              <LogOut size={18} />
               <span>Keluar Sistem</span>
             </button>
           </form>
