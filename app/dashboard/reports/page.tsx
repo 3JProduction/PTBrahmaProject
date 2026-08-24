@@ -105,7 +105,7 @@ export default async function ReportsPage() {
                           className="w-full flex justify-center items-center gap-1 text-green-700 bg-green-50 hover:bg-green-100 px-3 py-2 rounded-lg transition font-medium"
                         >
                           <CheckCircle size={16} />
-                          <span className="text-xs">ACC</span>
+                          <span className="text-xs">Selesai</span>
                         </button>
                       </form>
                     )}
