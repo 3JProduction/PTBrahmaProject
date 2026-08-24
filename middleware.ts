@@ -2,23 +2,22 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // Cek apakah user memiliki tiket masuk (cookie auth_session)
-  const session = request.cookies.get('auth_session');
+  // Cek tiket yang benar, yaitu 'userRole' sesuai yang dibuat di auth.ts
+  const role = request.cookies.get('userRole');
 
-  // Jika mencoba masuk ke dashboard tapi belum login, lempar ke halaman login
-  if (request.nextUrl.pathname.startsWith('/dashboard') && !session) {
+  // Jika mencoba masuk ke dashboard tapi belum login, lempar ke login
+  if (request.nextUrl.pathname.startsWith('/dashboard') && !role) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Jika sudah login tapi mencoba buka halaman login, lempar langsung ke dashboard
-  if (request.nextUrl.pathname === '/login' && session) {
+  // Jika sudah login tapi buka halaman login, lempar langsung ke dashboard
+  if (request.nextUrl.pathname === '/login' && role) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return NextResponse.next();
 }
 
-// Menentukan rute mana saja yang dijaga oleh satpam middleware ini
 export const config = {
   matcher: ['/dashboard/:path*', '/login'],
 };
