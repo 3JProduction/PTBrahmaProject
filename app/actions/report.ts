@@ -9,15 +9,14 @@ export async function createDailyReport(formData: FormData) {
   const weather = formData.get('weather') as string;
   const notes = formData.get('notes') as string;
 
-  // Karena kita belum punya fitur registrasi, kita buat/pastikan 
-  // akun "Admin" default sudah ada di database untuk dijadikan pembuat laporan (reporter)
+  // Menggunakan akun Site Manager BWAT dengan role SITE_MANAGER yang valid
   const defaultUser = await prisma.user.upsert({
-    where: { email: 'admin@bwc.com' },
+    where: { email: 'site@bwat.com' },
     update: {},
     create: {
-      name: 'Admin BWC',
-      email: 'admin@bwc.com',
-      role: 'ADMIN_KANTOR',
+      name: 'Site Manager BWAT',
+      email: 'site@bwat.com',
+      role: 'SITE_MANAGER',
     },
   });
 
