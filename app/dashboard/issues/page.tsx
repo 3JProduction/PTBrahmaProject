@@ -25,7 +25,7 @@ export default async function IssuesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
             <AlertTriangle className="text-red-500" />
@@ -43,7 +43,8 @@ export default async function IssuesPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-        <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse min-w-[700px]">
           <thead>
             <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
               <th className="p-4 font-semibold">Judul Kendala</th>
@@ -83,6 +84,7 @@ export default async function IssuesPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );
