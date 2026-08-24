@@ -12,20 +12,16 @@ export default async function CreateIssuePage() {
     orderBy: { createdAt: 'desc' }
   });
 
-  // 2. Tarik user pertama sebagai fallback pelapor
-  const defaultUser = await prisma.user.findFirst();
-
-  if (!defaultUser) {
-    return (
-      <div className="max-w-xl mx-auto p-8 text-center bg-white rounded-xl shadow-sm border border-gray-200 mt-10">
-        <h2 className="text-xl font-bold text-red-600 mb-2">Data Pengguna Belum Ada</h2>
-        <p className="text-gray-600 mb-4">Silakan buat minimal 1 data User di database Supabase terlebih dahulu.</p>
-        <Link href="/dashboard/issues" className="text-blue-600 hover:underline font-medium">
-          Kembali ke Daftar Issue
-        </Link>
-      </div>
-    );
-  }
+  // 2. Otomatis buat atau pastikan akun Site Manager ada (mencegah error kosong)
+  const defaultUser = await prisma.user.upsert({
+    where: { email: 'site@bwat.com' },
+    update: {},
+    create: {
+      name: 'Site Manager BWAT',
+      email: 'site@bwat.com',
+      role: 'SITE_MANAGER',
+    },
+  });
 
   // 3. Fungsi Server Action untuk menyimpan kendala baru
   async function createIssue(formData: FormData) {
@@ -36,14 +32,12 @@ export default async function CreateIssuePage() {
     const description = formData.get('description') as string;
     const severity = formData.get('severity') as any;
 
-    const user = await prisma.user.findFirst(); 
-
-    if (!projectId || !user || !title) return;
+    if (!projectId || !title) return;
 
     await prisma.issue.create({
       data: {
         projectId,
-        reporterId: user.id,
+        reporterId: defaultUser.id, // Menggunakan ID user dari upsert
         title,
         description,
         severity: severity || 'MEDIUM',

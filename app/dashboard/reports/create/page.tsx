@@ -5,29 +5,23 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 import { ArrowLeft, Save } from 'lucide-react';
-import { cookies } from 'next/headers';
 
 export default async function CreateReportPage() {
-  // 1. Ambil daftar proyek untuk pilihan dropdown
+  // 1. Tarik daftar proyek untuk pilihan dropdown
   const projects = await prisma.project.findMany({
     orderBy: { createdAt: 'desc' }
   });
 
-  // 2. Ambil user pertama sebagai fallback pelapor jika belum ada sistem login spesifik
-  const defaultUser = await prisma.user.findFirst();
-
-  // Jika belum ada user sama sekali di database, berikan peringatan agar tidak error
-  if (!defaultUser) {
-    return (
-      <div className="max-w-xl mx-auto p-8 text-center bg-white rounded-xl shadow-sm border border-gray-200 mt-10">
-        <h2 className="text-xl font-bold text-red-600 mb-2">Data Pengguna Belum Ada</h2>
-        <p className="text-gray-600 mb-4">Silakan buat minimal 1 data User (Pelapor) di database Supabase terlebih dahulu.</p>
-        <Link href="/dashboard/reports" className="text-blue-600 hover:underline font-medium">
-          Kembali ke Daftar Laporan
-        </Link>
-      </div>
-    );
-  }
+  // 2. Otomatis buat atau pastikan akun Site Manager ada (mencegah error kosong)
+  const defaultUser = await prisma.user.upsert({
+    where: { email: 'site@bwat.com' },
+    update: {},
+    create: {
+      name: 'Site Manager BWAT',
+      email: 'site@bwat.com',
+      role: 'SITE_MANAGER',
+    },
+  });
 
   // 3. Fungsi Server Action untuk menyimpan laporan baru
   async function createReport(formData: FormData) {
@@ -37,15 +31,12 @@ export default async function CreateReportPage() {
     const weather = formData.get('weather') as string;
     const notes = formData.get('notes') as string;
 
-    // Ambil user aktif dari cookie role atau gunakan default user
-    const user = await prisma.user.findFirst(); 
-
-    if (!projectId || !user) return;
+    if (!projectId) return;
 
     await prisma.dailyReport.create({
       data: {
         projectId,
-        reporterId: user.id, // Menggunakan ID user yang valid dari database
+        reporterId: defaultUser.id, // Menggunakan ID user yang otomatis dibuat/dipastikan ada
         weather,
         notes,
         status: 'PENDING'
