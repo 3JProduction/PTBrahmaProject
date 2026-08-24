@@ -19,10 +19,10 @@ export default function DashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Kirim data role ke Sidebar */}
+      {/* Sidebar memuat menu dan tombol logout di sebelah kiri */}
       <Sidebar role={role} />
       
-      {/* Konten Utama */}
+      {/* Konten halaman utama */}
       <div className="ml-64 flex-1 p-8">
         {children}
       </div>
