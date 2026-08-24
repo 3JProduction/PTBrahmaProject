@@ -91,10 +91,10 @@ export default async function ReportsPage() {
                   <div className="pt-3 border-t border-gray-100 flex items-center justify-end gap-2 mt-2">
                     <Link 
                       href={`/dashboard/reports/${report.id}`} 
-                      className="flex-1 flex justify-center items-center gap-1 text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition font-medium"
+                      className="flex-1 flex justify-center items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition py-1.5"
                     >
                       <Eye size={16} />
-                      <span className="text-xs">Detail</span>
+                      <span>Detail</span>
                     </Link>
                     
                     {report.status !== 'APPROVED' && (
@@ -102,10 +102,10 @@ export default async function ReportsPage() {
                         <input type="hidden" name="id" value={report.id} />
                         <button 
                           type="submit" 
-                          className="w-full flex justify-center items-center gap-1 text-green-700 bg-green-50 hover:bg-green-100 px-3 py-2 rounded-lg transition font-medium"
+                          className="w-full flex justify-center items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition py-1.5"
                         >
                           <CheckCircle size={16} />
-                          <span className="text-xs">Selesai</span>
+                          <span>Selesai</span>
                         </button>
                       </form>
                     )}
@@ -152,13 +152,13 @@ export default async function ReportsPage() {
                       
                       {isPM && (
                         <td className="p-4 text-center">
-                          <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center justify-center gap-4">
                             <Link 
                               href={`/dashboard/reports/${report.id}`} 
-                              className="text-blue-600 hover:bg-blue-50 p-2 rounded-lg transition"
-                              title="Lihat Detail & Catatan"
+                              className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                             >
-                              <Eye size={18} />
+                              <Eye size={16} />
+                              <span>Detail</span>
                             </Link>
                             
                             {report.status !== 'APPROVED' && (
@@ -166,10 +166,10 @@ export default async function ReportsPage() {
                                 <input type="hidden" name="id" value={report.id} />
                                 <button 
                                   type="submit" 
-                                  className="text-green-600 hover:bg-green-50 p-2 rounded-lg transition"
-                                  title="ACC / Setujui Laporan"
+                                  className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
                                 >
-                                  <CheckCircle size={18} />
+                                  <CheckCircle size={16} />
+                                  <span>Selesai</span>
                                 </button>
                               </form>
                             )}
