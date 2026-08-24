@@ -27,3 +27,8 @@ export async function logout() {
   cookies().delete('userRole');
   redirect('/login');
 }
+
+export async function handleLogout() {
+  cookies().delete('userRole');
+  redirect('/login');
+}
