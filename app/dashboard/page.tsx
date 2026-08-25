@@ -1,252 +1,147 @@
-import Link from 'next/link';
-import { Plus, Save, CheckCircle, RefreshCw } from 'lucide-react';
-import prisma from '@/lib/prisma';
-import { cookies } from 'next/headers';
-
 export const dynamic = 'force-dynamic';
 
-export default async function ProjectsPage() {
-  const role = cookies().get('userRole')?.value;
-  const projects = await prisma.project.findMany({
+import Link from 'next/link';
+import { Briefcase, FileText, AlertTriangle, CheckCircle, Activity, ArrowRight } from 'lucide-react';
+import prisma from '@/lib/prisma';
+import ProgressChart from '@/components/ProgressChart';
+
+export default async function DashboardPage() {
+  // 1. Tarik semua data statistik dari database
+  const activeProjectsCount = await prisma.project.count({
+    where: { status: 'ON_PROGRESS' }
+  });
+
+  // (BARU) Tarik data jumlah proyek yang sudah selesai
+  const completedProjectsCount = await prisma.project.count({
+    where: { status: 'COMPLETED' }
+  });
+
+  // Asumsi status default saat laporan dibuat adalah 'PENDING'
+  const pendingReportsCount = await prisma.dailyReport.count({
+    where: { status: 'PENDING' }
+  });
+
+  const unresolvedIssuesCount = await prisma.issue.count({
+    where: { isResolved: false }
+  });
+
+  // 2. Tarik 3 data proyek terbaru untuk ditampilkan di list bawah
+  const recentProjects = await prisma.project.findMany({
+    take: 3,
     orderBy: { createdAt: 'desc' }
   });
 
+  const activeProjectsForChart = await prisma.project.findMany({
+    where: { status: 'ON_PROGRESS' },
+    select: { title: true, progress: true }
+  });
+
+  const chartData = activeProjectsForChart.map(p => ({
+    name: p.title,
+    progress: p.progress
+  }));
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* HEADER */}
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Data Proyek</h1>
-          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan pantau persentase progress.</p>
-        </div>
-        {role === 'SITE_MANAGER' && (
-          <Link 
-            href="/dashboard/projects/create" 
-            className="bg-blue-700 text-white px-4 py-2.5 rounded-lg hover:bg-blue-800 transition flex items-center justify-center space-x-2 font-medium text-sm sm:text-base w-full sm:w-auto shadow-sm"
-          >
-            <Plus size={20} />
-            <span>Tambah Proyek</span>
-          </Link>
-        )}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Selamat Datang di Dashboard BWAT</h1>
+        <p className="text-gray-500">Ringkasan aktivitas dan status proyek konstruksi Anda hari ini.</p>
       </div>
 
-      {projects.length === 0 ? (
-        <div className="bg-white p-8 rounded-xl border border-gray-200 text-center text-gray-500 text-sm">
-          Belum ada proyek. Silakan tambah proyek baru.
+      {/* KARTU STATISTIK (Diubah menjadi grid-cols-4 pada layar besar) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        
+        {/* Kartu 1: Proyek Aktif */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <Briefcase className="text-blue-600" size={26} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Proyek Aktif</p>
+            <h3 className="text-3xl font-bold text-gray-900">{activeProjectsCount}</h3>
+          </div>
         </div>
-      ) : (
-        <>
-          {/* 📱 TAMPILAN MOBILE: Model Card */}
-          <div className="grid grid-cols-1 gap-4 md:hidden">
-            {projects.map((project) => (
-              <div key={project.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3">
-                <div className="flex justify-between items-start gap-4">
-                  <h3 className="font-bold text-gray-900 text-base leading-tight">{project.title}</h3>
-                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide whitespace-nowrap ${
+
+        {/* Kartu 2: Laporan Pending */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-yellow-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <FileText className="text-yellow-600" size={26} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Laporan Menunggu (Pending)</p>
+            <h3 className="text-3xl font-bold text-gray-900">{pendingReportsCount}</h3>
+          </div>
+        </div>
+
+        {/* Kartu 3: Kendala Belum Selesai */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="text-red-600" size={26} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Kendala Belum Selesai</p>
+            <h3 className="text-3xl font-bold text-gray-900">{unresolvedIssuesCount}</h3>
+          </div>
+        </div>
+
+        {/* Kartu 4: Proyek Selesai (BARU) */}
+        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex items-center gap-5">
+          <div className="w-14 h-14 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="text-green-600" size={26} />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Proyek Selesai</p>
+            <h3 className="text-3xl font-bold text-gray-900">{completedProjectsCount}</h3>
+          </div>
+        </div>
+
+      </div>
+
+      <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm mb-8">
+          <h2 className="text-lg font-bold text-gray-900 mb-2">Grafik Progres Proyek Aktif</h2>
+          <ProgressChart data={chartData} />
+      </div>
+
+      {/* DAFTAR PROYEK TERBARU */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+          <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <Activity className="text-blue-600" size={20} />
+            Proyek Terbaru
+          </h2>
+          <Link href="/dashboard/projects" className="text-blue-600 text-sm font-medium flex items-center gap-1 hover:underline">
+            Lihat Semua <ArrowRight size={16} />
+          </Link>
+        </div>
+        
+        <div className="divide-y divide-gray-100">
+          {recentProjects.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 text-sm">
+              Belum ada data proyek.
+            </div>
+          ) : (
+            recentProjects.map(project => (
+              <div key={project.id} className="p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4 hover:bg-gray-50 transition">
+                <div>
+                  <h3 className="font-bold text-gray-900 text-base">{project.title}</h3>
+                  <p className="text-gray-500 text-sm">{project.location}</p>
+                </div>
+                <div className="sm:text-right">
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block mb-2 sm:mb-1 ${
                     project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
                   }`}>
                     {project.status.replace('_', ' ')}
                   </span>
+                  <p className="text-gray-400 text-xs">
+                    Mulai: {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                  </p>
                 </div>
-                
-                <div className="flex flex-col space-y-1.5 text-sm text-gray-600 border-t border-gray-100 pt-2">
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold text-gray-700 w-28 shrink-0">Lokasi:</span>
-                    <span>{project.location}</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold text-gray-700 w-28 shrink-0">Mulai:</span>
-                    <span>{project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                  </div>
-                  <div className="flex items-center gap-2 pt-1">
-                    <span className="font-semibold text-gray-700 w-28 shrink-0">Progress Saat Ini:</span>
-                    <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
-                  </div>
-                </div>
-
-                {/* Form Update Progres & Status HANYA UNTUK PROJECT MANAGER (OWNER) */}
-                {role === 'OWNER' && (
-                  <div className="pt-3 border-t border-gray-100 flex flex-col space-y-3">
-                    <form action={async (formData) => {
-                      'use server';
-                      const newProgress = Number(formData.get('progress'));
-                      await prisma.project.update({
-                        where: { id: project.id },
-                        data: { 
-                          progress: newProgress,
-                          status: newProgress === 100 ? 'COMPLETED' : project.status 
-                        }
-                      });
-                    }} className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <input 
-                          type="number" 
-                          name="progress" 
-                          defaultValue={project.progress ?? 0} 
-                          min="0" 
-                          max="100"
-                          className="w-16 px-2 py-1.5 border border-gray-300 rounded-lg text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                        />
-                        <span className="text-sm font-semibold text-gray-600">%</span>
-                      </div>
-                      <button 
-                        type="submit" 
-                        className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
-                      >
-                        <Save size={18} />
-                        <span>Simpan</span>
-                      </button>
-                    </form>
-
-                    <div className="flex justify-end pt-2 border-t border-gray-100">
-                      {project.status !== 'COMPLETED' ? (
-                        <form action={async () => {
-                          'use server';
-                          await prisma.project.update({
-                            where: { id: project.id },
-                            data: { status: 'COMPLETED', progress: 100 }
-                          });
-                        }}>
-                          <button 
-                            type="submit"
-                            className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                          >
-                            <CheckCircle size={18} />
-                            <span>Selesaikan Proyek</span>
-                          </button>
-                        </form>
-                      ) : (
-                        <form action={async () => {
-                          'use server';
-                          await prisma.project.update({
-                            where: { id: project.id },
-                            data: { status: 'ON_PROGRESS' }
-                          });
-                        }}>
-                          <button 
-                            type="submit"
-                            className="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 text-sm font-medium transition"
-                          >
-                            <RefreshCw size={18} />
-                            <span>Ubah ke On Progress</span>
-                          </button>
-                        </form>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
-            ))}
-          </div>
-
-          {/* 💻 TAMPILAN DESKTOP: Model Tabel */}
-          <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
-                  <th className="p-4 font-semibold">Nama Proyek</th>
-                  <th className="p-4 font-semibold">Lokasi</th>
-                  <th className="p-4 font-semibold">Tanggal Mulai</th>
-                  <th className="p-4 font-semibold">Status</th>
-                  <th className="p-4 font-semibold">Progress</th>
-                  {role === 'OWNER' && <th className="p-4 font-semibold text-center">Update</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map((project) => (
-                  <tr key={project.id} className="border-b border-gray-100 hover:bg-gray-50 transition text-sm">
-                    <td className="p-4 font-medium text-gray-900">{project.title}</td>
-                    <td className="p-4 text-gray-600">{project.location}</td>
-                    <td className="p-4 text-gray-600">
-                      {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
-                        project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {project.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      {role === 'OWNER' ? (
-                        <form action={async (formData) => {
-                          'use server';
-                          const newProgress = Number(formData.get('progress'));
-                          await prisma.project.update({
-                            where: { id: project.id },
-                            data: { 
-                              progress: newProgress,
-                              status: newProgress === 100 ? 'COMPLETED' : project.status 
-                            }
-                          });
-                        }} className="flex items-center gap-2">
-                          <input 
-                            type="number" 
-                            name="progress" 
-                            defaultValue={project.progress ?? 0} 
-                            min="0" 
-                            max="100"
-                            className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
-                          />
-                          <span className="font-semibold">%</span>
-                          <button 
-                            type="submit" 
-                            className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition ml-1"
-                          >
-                            <Save size={18} />
-                            <span>Simpan</span>
-                          </button>
-                        </form>
-                      ) : (
-                        <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
-                      )}
-                    </td>
-                    {role === 'OWNER' && (
-                      <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-4">
-                          {project.status !== 'COMPLETED' ? (
-                            <form action={async () => {
-                              'use server';
-                              await prisma.project.update({
-                                where: { id: project.id },
-                                data: { status: 'COMPLETED', progress: 100 }
-                              });
-                            }}>
-                              <button 
-                                type="submit"
-                                className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                              >
-                                <CheckCircle size={18} />
-                                <span>Selesaikan Proyek</span>
-                              </button>
-                            </form>
-                          ) : (
-                            <form action={async () => {
-                              'use server';
-                              await prisma.project.update({
-                                where: { id: project.id },
-                                data: { status: 'ON_PROGRESS' }
-                              });
-                            }}>
-                              <button 
-                                type="submit"
-                                className="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 text-sm font-medium transition"
-                              >
-                                <RefreshCw size={18} />
-                                <span>Ubah ke On Progress</span>
-                              </button>
-                            </form>
-                          )}
-                        </div>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
+            ))
+          )}
+        </div>
+      </div>
     </div>
   );
 }
