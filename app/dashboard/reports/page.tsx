@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { Plus, CheckCircle, Eye } from 'lucide-react'; 
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
@@ -26,12 +24,11 @@ export default async function ReportsPage() {
       where: { id },
       data: { status: 'APPROVED' }
     });
-    revalidatePath('/dashboard/reports');
+    revalidatePath('/dashboard/reports'); // CACHE RESET
   }
 
   return (
     <div className="space-y-6">
-      {/* HEADER RESPONSIF */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Laporan Harian</h1>
@@ -54,7 +51,6 @@ export default async function ReportsPage() {
         </div>
       ) : (
         <>
-          {/* 📱 TAMPILAN MOBILE: Model Card */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {reports.map((report) => (
               <div key={report.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3">
@@ -85,24 +81,16 @@ export default async function ReportsPage() {
                   </div>
                 </div>
 
-                {/* Tombol Aksi Khusus PM (Mobile) */}
                 {isPM && (
                   <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-6 mt-1">
-                    <Link 
-                      href={`/dashboard/reports/${report.id}`} 
-                      className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
-                    >
+                    <Link href={`/dashboard/reports/${report.id}`} className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition">
                       <Eye size={18} />
                       <span>Detail</span>
                     </Link>
-                    
                     {report.status !== 'APPROVED' && (
                       <form action={accReport}>
                         <input type="hidden" name="id" value={report.id} />
-                        <button 
-                          type="submit" 
-                          className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                        >
+                        <button type="submit" className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition">
                           <CheckCircle size={18} />
                           <span>Selesai</span>
                         </button>
@@ -114,7 +102,6 @@ export default async function ReportsPage() {
             ))}
           </div>
 
-          {/* 💻 TAMPILAN DESKTOP: Model Tabel */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[700px]">
@@ -125,7 +112,7 @@ export default async function ReportsPage() {
                     <th className="p-4 font-semibold">Cuaca</th>
                     <th className="p-4 font-semibold">Pelapor</th>
                     <th className="p-4 font-semibold">Status</th>
-                    {isPM && <th className="p-4 font-semibold text-center">Update</th>}
+                    {isPM && <th className="p-4 font-semibold text-center">Aksi (PM)</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -146,26 +133,17 @@ export default async function ReportsPage() {
                           {report.status}
                         </span>
                       </td>
-                      
-                      {/* Tombol Aksi Khusus PM (Desktop) */}
                       {isPM && (
                         <td className="p-4 text-center">
                           <div className="flex items-center justify-center gap-6">
-                            <Link 
-                              href={`/dashboard/reports/${report.id}`} 
-                              className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
-                            >
+                            <Link href={`/dashboard/reports/${report.id}`} className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition">
                               <Eye size={18} />
                               <span>Detail</span>
                             </Link>
-                            
                             {report.status !== 'APPROVED' && (
                               <form action={accReport}>
                                 <input type="hidden" name="id" value={report.id} />
-                                <button 
-                                  type="submit" 
-                                  className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                                >
+                                <button type="submit" className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition">
                                   <CheckCircle size={18} />
                                   <span>Selesai</span>
                                 </button>

@@ -1,12 +1,9 @@
-export const dynamic = 'force-dynamic';
-
 import { Plus, CheckCircle, Eye, AlertTriangle } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 
-// Kamus penerjemah level keparahan
 const severityMap: Record<string, string> = {
   LOW: 'RENDAH',
   MEDIUM: 'SEDANG',
@@ -18,7 +15,6 @@ export default async function IssuesPage() {
   const role = cookies().get('userRole')?.value;
   const isPM = role === 'PROJECT_MANAGER' || role === 'OWNER';
 
-  // Tarik data kendala beserta nama proyek dan pelapornya
   const issues = await prisma.issue.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
@@ -35,17 +31,16 @@ export default async function IssuesPage() {
       where: { id },
       data: { isResolved: true }
     });
-    revalidatePath('/dashboard/issues');
+    revalidatePath('/dashboard/issues'); // CACHE RESET
   }
 
   return (
     <div className="space-y-6">
-      {/* HEADER RESPONSIF */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
             <AlertTriangle className="text-red-500" size={28} />
-            Laporan Kendala
+            Pelacakan Kendala
           </h1>
           <p className="text-sm sm:text-base text-gray-500">Pantau dan selesaikan kendala yang terjadi di lapangan.</p>
         </div>
@@ -66,7 +61,6 @@ export default async function IssuesPage() {
         </div>
       ) : (
         <>
-          {/* 📱 TAMPILAN MOBILE: Model Card */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {issues.map((issue) => (
               <div key={issue.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3">
@@ -101,24 +95,16 @@ export default async function IssuesPage() {
                   </div>
                 </div>
 
-                {/* Kolom Aksi Khusus PM (Mobile) */}
                 {isPM && (
                   <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-6 mt-1">
-                    <Link 
-                      href={`/dashboard/issues/${issue.id}`} 
-                      className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
-                    >
+                    <Link href={`/dashboard/issues/${issue.id}`} className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition">
                       <Eye size={18} />
                       <span>Detail</span>
                     </Link>
-                    
                     {!issue.isResolved && (
                       <form action={resolveIssue}>
                         <input type="hidden" name="id" value={issue.id} />
-                        <button 
-                          type="submit" 
-                          className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                        >
+                        <button type="submit" className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition">
                           <CheckCircle size={18} />
                           <span>Selesai</span>
                         </button>
@@ -130,7 +116,6 @@ export default async function IssuesPage() {
             ))}
           </div>
 
-          {/* 💻 TAMPILAN DESKTOP: Model Tabel Asli */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <table className="w-full text-left border-collapse min-w-[800px]">
               <thead>
@@ -140,9 +125,7 @@ export default async function IssuesPage() {
                   <th className="p-4 font-semibold">Keparahan</th>
                   <th className="p-4 font-semibold">Pelapor</th>
                   <th className="p-4 font-semibold">Status</th>
-                  {isPM && (
-                    <th className="p-4 font-semibold text-center">Penyelesaian</th>
-                  )}
+                  {isPM && <th className="p-4 font-semibold text-center">Penyelesaian</th>}
                 </tr>
               </thead>
               <tbody>
@@ -168,26 +151,17 @@ export default async function IssuesPage() {
                         {issue.isResolved ? 'TERSELESAIKAN' : 'BELUM SELESAI'}
                       </span>
                     </td>
-                    
-                    {/* Kolom Aksi Khusus PM (Desktop) */}
                     {isPM && (
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-6">
-                          <Link 
-                            href={`/dashboard/issues/${issue.id}`} 
-                            className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
-                          >
+                          <Link href={`/dashboard/issues/${issue.id}`} className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition">
                             <Eye size={18} />
                             <span>Detail</span>
                           </Link>
-                          
                           {!issue.isResolved && (
                             <form action={resolveIssue}>
                               <input type="hidden" name="id" value={issue.id} />
-                              <button 
-                                type="submit" 
-                                className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                              >
+                              <button type="submit" className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition">
                                 <CheckCircle size={18} />
                                 <span>Selesai</span>
                               </button>
