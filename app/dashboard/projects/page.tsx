@@ -141,109 +141,111 @@ export default async function ProjectsPage() {
 
           {/* 💻 TAMPILAN DESKTOP: Model Tabel */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
-                  <th className="p-4 font-semibold w-1/4">Nama Proyek</th>
-                  <th className="p-4 font-semibold w-1/6">Lokasi</th>
-                  <th className="p-4 font-semibold w-1/6">Tanggal Mulai</th>
-                  <th className="p-4 font-semibold w-1/8">Status</th>
-                  <th className="p-4 font-semibold w-auto">Progress</th>
-                  {role === 'OWNER' && <th className="p-4 font-semibold text-left w-1/6">Update</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {projects.map((project) => (
-                  <tr key={project.id} className="border-b border-gray-100 hover:bg-gray-50 transition text-sm">
-                    <td className="p-4 font-medium text-gray-900">{project.title}</td>
-                    <td className="p-4 text-gray-600">{project.location}</td>
-                    <td className="p-4 text-gray-600">
-                      {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
-                    </td>
-                    <td className="p-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block ${
-                        project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
-                      }`}>
-                        {project.status.replace('_', ' ')}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      {role === 'OWNER' ? (
-                        <form action={async (formData) => {
-                          'use server';
-                          const newProgress = Number(formData.get('progress'));
-                          await prisma.project.update({
-                            where: { id: project.id },
-                            data: { 
-                              progress: newProgress,
-                              status: newProgress === 100 ? 'COMPLETED' : project.status 
-                            }
-                          });
-                        }} className="flex items-center gap-2">
-                          <input 
-                            type="number" 
-                            name="progress" 
-                            defaultValue={project.progress ?? 0} 
-                            min="0" 
-                            max="100"
-                            className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
-                          />
-                          <span className="font-semibold">%</span>
-                          <button 
-                            type="submit" 
-                            className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition ml-1"
-                          >
-                            <Save size={18} />
-                            <span>Simpan</span>
-                          </button>
-                        </form>
-                      ) : (
-                        <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
-                      )}
-                    </td>
-                    {role === 'OWNER' && (
-                      <td className="p-4 text-left">
-                        <div className="flex items-center justify-start gap-4">
-                          {project.status !== 'COMPLETED' ? (
-                            <form action={async () => {
-                              'use server';
-                              await prisma.project.update({
-                                where: { id: project.id },
-                                data: { status: 'COMPLETED', progress: 100 }
-                              });
-                            }}>
-                              <button 
-                                type="submit"
-                                className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
-                              >
-                                <CheckCircle size={18} />
-                                <span>Selesaikan Proyek</span>
-                              </button>
-                            </form>
-                          ) : (
-                            <form action={async () => {
-                              'use server';
-                              await prisma.project.update({
-                                where: { id: project.id },
-                                data: { status: 'ON_PROGRESS' }
-                              });
-                            }}>
-                              <button 
-                                type="submit"
-                                className="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 text-sm font-medium transition"
-                              >
-                                <RefreshCw size={18} />
-                                <span>Ubah ke On Progress</span>
-                              </button>
-                            </form>
-                          )}
-                        </div>
-                      </td>
-                    )}
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse min-w-[800px]">
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
+                    <th className="p-4 font-semibold w-1/4">Nama Proyek</th>
+                    <th className="p-4 font-semibold w-1/6">Lokasi</th>
+                    <th className="p-4 font-semibold w-1/6">Tanggal Mulai</th>
+                    <th className="p-4 font-semibold w-1/8">Status</th>
+                    <th className="p-4 font-semibold w-auto">Progress</th>
+                    {role === 'OWNER' && <th className="p-4 font-semibold text-left w-1/6">Update</th>}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {projects.map((project) => (
+                    <tr key={project.id} className="border-b border-gray-100 hover:bg-gray-50 transition text-sm">
+                      <td className="p-4 font-medium text-gray-900">{project.title}</td>
+                      <td className="p-4 text-gray-600">{project.location}</td>
+                      <td className="p-4 text-gray-600">
+                        {project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      </td>
+                      <td className="p-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold tracking-wide inline-block whitespace-nowrap ${
+                          project.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {project.status.replace('_', ' ')}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        {role === 'OWNER' ? (
+                          <form action={async (formData) => {
+                            'use server';
+                            const newProgress = Number(formData.get('progress'));
+                            await prisma.project.update({
+                              where: { id: project.id },
+                              data: { 
+                                progress: newProgress,
+                                status: newProgress === 100 ? 'COMPLETED' : project.status 
+                              }
+                            });
+                          }} className="flex items-center gap-2">
+                            <input 
+                              type="number" 
+                              name="progress" 
+                              defaultValue={project.progress ?? 0} 
+                              min="0" 
+                              max="100"
+                              className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
+                            />
+                            <span className="font-semibold">%</span>
+                            <button 
+                              type="submit" 
+                              className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition ml-1"
+                            >
+                              <Save size={18} />
+                              <span>Simpan</span>
+                            </button>
+                          </form>
+                        ) : (
+                          <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
+                        )}
+                      </td>
+                      {role === 'OWNER' && (
+                        <td className="p-4 text-left">
+                          <div className="flex items-center justify-start gap-4">
+                            {project.status !== 'COMPLETED' ? (
+                              <form action={async () => {
+                                'use server';
+                                await prisma.project.update({
+                                  where: { id: project.id },
+                                  data: { status: 'COMPLETED', progress: 100 }
+                                });
+                              }}>
+                                <button 
+                                  type="submit"
+                                  className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition whitespace-nowrap"
+                                >
+                                  <CheckCircle size={18} />
+                                  <span>Selesaikan Proyek</span>
+                                </button>
+                              </form>
+                            ) : (
+                              <form action={async () => {
+                                'use server';
+                                await prisma.project.update({
+                                  where: { id: project.id },
+                                  data: { status: 'ON_PROGRESS' }
+                                });
+                              }}>
+                                <button 
+                                  type="submit"
+                                  className="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 text-sm font-medium transition whitespace-nowrap"
+                                >
+                                  <RefreshCw size={18} />
+                                  <span>Ubah ke On Progress</span>
+                                </button>
+                              </form>
+                            )}
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}
