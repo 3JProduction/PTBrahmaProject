@@ -125,7 +125,7 @@ export default async function ReportsPage() {
                     <th className="p-4 font-semibold">Cuaca</th>
                     <th className="p-4 font-semibold">Pelapor</th>
                     <th className="p-4 font-semibold">Status</th>
-                    {isPM && <th className="p-4 font-semibold text-center">Aksi (PM)</th>}
+                    {isPM && <th className="p-4 font-semibold text-center">Update</th>}
                   </tr>
                 </thead>
                 <tbody>
