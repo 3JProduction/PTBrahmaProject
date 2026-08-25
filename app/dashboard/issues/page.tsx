@@ -58,7 +58,7 @@ export default async function IssuesPage() {
         </div>
       ) : (
         <>
-          {/* 📱 TAMPILAN MOBILE: Model Card (List Kebawah) */}
+          {/* 📱 TAMPILAN MOBILE: Model Card */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {issues.map((issue) => (
               <div key={issue.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3">
@@ -93,26 +93,26 @@ export default async function IssuesPage() {
                   </div>
                 </div>
 
-                {/* Kolom Aksi Khusus PM (Mobile) */}
+                {/* Kolom Aksi Khusus PM (Mobile) - DIPERBARUI IDENTIK */}
                 {isPM && (
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-end gap-2 mt-2">
+                  <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-6 mt-1">
                     <Link 
                       href={`/dashboard/issues/${issue.id}`} 
-                      className="flex-1 flex justify-center items-center gap-1 text-blue-600 bg-blue-50 hover:bg-blue-100 px-3 py-2 rounded-lg transition font-medium"
+                      className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                     >
-                      <Eye size={16} />
-                      <span className="text-xs">Detail</span>
+                      <Eye size={18} />
+                      <span>Detail</span>
                     </Link>
                     
                     {!issue.isResolved && (
-                      <form action={resolveIssue} className="flex-1 flex">
+                      <form action={resolveIssue}>
                         <input type="hidden" name="id" value={issue.id} />
                         <button 
                           type="submit" 
-                          className="w-full flex justify-center items-center gap-1 text-green-700 bg-green-50 hover:bg-green-100 px-3 py-2 rounded-lg transition font-medium"
+                          className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
                         >
-                          <CheckCircle size={16} />
-                          <span className="text-xs">Selesai</span>
+                          <CheckCircle size={18} />
+                          <span>Selesai</span>
                         </button>
                       </form>
                     )}
@@ -161,17 +161,16 @@ export default async function IssuesPage() {
                       </span>
                     </td>
                     
-                    {/* Kolom Aksi Khusus PM (Desktop) */}
+                    {/* Kolom Aksi Khusus PM (Desktop) - DIPERBARUI IDENTIK */}
                     {isPM && (
                       <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-6">
                           <Link 
                             href={`/dashboard/issues/${issue.id}`} 
-                            className="flex items-center gap-1 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg transition border border-transparent hover:border-blue-200"
-                            title="Lihat Detail Issue"
+                            className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                           >
-                            <Eye size={16} />
-                            <span className="text-xs font-semibold">Detail</span>
+                            <Eye size={18} />
+                            <span>Detail</span>
                           </Link>
                           
                           {!issue.isResolved && (
@@ -179,11 +178,10 @@ export default async function IssuesPage() {
                               <input type="hidden" name="id" value={issue.id} />
                               <button 
                                 type="submit" 
-                                className="flex items-center gap-1 text-green-600 hover:bg-green-50 px-3 py-1.5 rounded-lg transition border border-transparent hover:border-green-200"
-                                title="ACC Selesai Cepat"
+                                className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
                               >
-                                <CheckCircle size={16} />
-                                <span className="text-xs font-semibold">Selesai</span>
+                                <CheckCircle size={18} />
+                                <span>Selesai</span>
                               </button>
                             </form>
                           )}

@@ -10,7 +10,6 @@ export default async function ReportsPage() {
   const role = cookies().get('userRole')?.value;
   const isPM = role === 'PROJECT_MANAGER' || role === 'OWNER';
   
-  // Ambil data laporan sekaligus menarik nama proyek dan nama pelapor
   const reports = await prisma.dailyReport.findMany({
     orderBy: { createdAt: 'desc' },
     include: {
@@ -55,7 +54,7 @@ export default async function ReportsPage() {
         </div>
       ) : (
         <>
-          {/* 📱 TAMPILAN MOBILE: Model Card (List Kebawah) */}
+          {/* 📱 TAMPILAN MOBILE: Model Card */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {reports.map((report) => (
               <div key={report.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3">
@@ -86,25 +85,25 @@ export default async function ReportsPage() {
                   </div>
                 </div>
 
-                {/* Kolom Aksi Khusus PM (Mobile) */}
+                {/* Tombol Aksi Khusus PM (Mobile) */}
                 {isPM && (
-                  <div className="pt-3 border-t border-gray-100 flex items-center justify-end gap-2 mt-2">
+                  <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-6 mt-1">
                     <Link 
                       href={`/dashboard/reports/${report.id}`} 
-                      className="flex-1 flex justify-center items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition py-1.5"
+                      className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                     >
-                      <Eye size={16} />
+                      <Eye size={18} />
                       <span>Detail</span>
                     </Link>
                     
                     {report.status !== 'APPROVED' && (
-                      <form action={accReport} className="flex-1 flex">
+                      <form action={accReport}>
                         <input type="hidden" name="id" value={report.id} />
                         <button 
                           type="submit" 
-                          className="w-full flex justify-center items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition py-1.5"
+                          className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
                         >
-                          <CheckCircle size={16} />
+                          <CheckCircle size={18} />
                           <span>Selesai</span>
                         </button>
                       </form>
@@ -115,7 +114,7 @@ export default async function ReportsPage() {
             ))}
           </div>
 
-          {/* 💻 TAMPILAN DESKTOP: Model Tabel Asli */}
+          {/* 💻 TAMPILAN DESKTOP: Model Tabel */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[700px]">
@@ -126,9 +125,7 @@ export default async function ReportsPage() {
                     <th className="p-4 font-semibold">Cuaca</th>
                     <th className="p-4 font-semibold">Pelapor</th>
                     <th className="p-4 font-semibold">Status</th>
-                    {isPM && (
-                      <th className="p-4 font-semibold text-center">Aksi (PM)</th>
-                    )}
+                    {isPM && <th className="p-4 font-semibold text-center">Aksi (PM)</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -150,14 +147,15 @@ export default async function ReportsPage() {
                         </span>
                       </td>
                       
+                      {/* Tombol Aksi Khusus PM (Desktop) */}
                       {isPM && (
                         <td className="p-4 text-center">
-                          <div className="flex items-center justify-center gap-4">
+                          <div className="flex items-center justify-center gap-6">
                             <Link 
                               href={`/dashboard/reports/${report.id}`} 
                               className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                             >
-                              <Eye size={16} />
+                              <Eye size={18} />
                               <span>Detail</span>
                             </Link>
                             
@@ -168,7 +166,7 @@ export default async function ReportsPage() {
                                   type="submit" 
                                   className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
                                 >
-                                  <CheckCircle size={16} />
+                                  <CheckCircle size={18} />
                                   <span>Selesai</span>
                                 </button>
                               </form>
