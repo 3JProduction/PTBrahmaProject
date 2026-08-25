@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, Save, CheckCircle, RefreshCw } from 'lucide-react';
 import prisma from '@/lib/prisma';
 import { cookies } from 'next/headers';
 
@@ -17,7 +17,7 @@ export default async function ProjectsPage() {
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Data Proyek</h1>
-          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan pantau persentase progres.</p>
+          <p className="text-sm sm:text-base text-gray-500">Kelola semua proyek konstruksi dan pantau persentase progress.</p>
         </div>
         {role === 'SITE_MANAGER' && (
           <Link 
@@ -36,7 +36,7 @@ export default async function ProjectsPage() {
         </div>
       ) : (
         <>
-          {/* 📱 TAMPILAN MOBILE: Model Card (List Kebawah) */}
+          {/* 📱 TAMPILAN MOBILE: Model Card */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {projects.map((project) => (
               <div key={project.id} className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3">
@@ -59,14 +59,14 @@ export default async function ProjectsPage() {
                     <span>{project.startDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                   </div>
                   <div className="flex items-center gap-2 pt-1">
-                    <span className="font-semibold text-gray-700 w-28 shrink-0">Proses Saat Ini:</span>
+                    <span className="font-semibold text-gray-700 w-28 shrink-0">Progress Saat Ini:</span>
                     <span className="font-bold text-blue-700">{project.progress ?? 0}%</span>
                   </div>
                 </div>
 
                 {/* Form Update Progres & Status HANYA UNTUK PROJECT MANAGER (OWNER) */}
                 {role === 'OWNER' && (
-                  <div className="pt-3 border-t border-gray-100 flex flex-col space-y-2">
+                  <div className="pt-3 border-t border-gray-100 flex flex-col space-y-3">
                     <form action={async (formData) => {
                       'use server';
                       const newProgress = Number(formData.get('progress'));
@@ -91,13 +91,14 @@ export default async function ProjectsPage() {
                       </div>
                       <button 
                         type="submit" 
-                        className="bg-blue-700 text-white text-xs font-semibold px-4 py-2 rounded-lg hover:bg-blue-800 transition shadow-sm"
+                        className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition"
                       >
-                        Simpan Progres
+                        <Save size={18} />
+                        <span>Simpan</span>
                       </button>
                     </form>
 
-                    <div className="flex justify-end pt-2">
+                    <div className="flex justify-end pt-2 border-t border-gray-100">
                       {project.status !== 'COMPLETED' ? (
                         <form action={async () => {
                           'use server';
@@ -108,9 +109,10 @@ export default async function ProjectsPage() {
                         }}>
                           <button 
                             type="submit"
-                            className="bg-green-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg hover:bg-green-700 transition shadow-sm"
+                            className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
                           >
-                            Selesaikan Proyek
+                            <CheckCircle size={18} />
+                            <span>Selesaikan Proyek</span>
                           </button>
                         </form>
                       ) : (
@@ -123,9 +125,10 @@ export default async function ProjectsPage() {
                         }}>
                           <button 
                             type="submit"
-                            className="bg-amber-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg hover:bg-amber-700 transition shadow-sm"
+                            className="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 text-sm font-medium transition"
                           >
-                            Ubah ke On Progress
+                            <RefreshCw size={18} />
+                            <span>Ubah ke On Progress</span>
                           </button>
                         </form>
                       )}
@@ -141,12 +144,12 @@ export default async function ProjectsPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-200 text-gray-600 text-sm">
-                  <th className="p-4 font-semibold">Nama Proyek</th>
-                  <th className="p-4 font-semibold">Lokasi</th>
-                  <th className="p-4 font-semibold">Tanggal Mulai</th>
-                  <th className="p-4 font-semibold">Status</th>
-                  <th className="p-4 font-semibold">Progres</th>
-                  {role === 'OWNER' && <th className="p-4 font-semibold text-right">Aksi</th>}
+                  <th className="p-4 font-semibold w-1/4">Nama Proyek</th>
+                  <th className="p-4 font-semibold w-1/6">Lokasi</th>
+                  <th className="p-4 font-semibold w-1/6">Tanggal Mulai</th>
+                  <th className="p-4 font-semibold w-1/8">Status</th>
+                  <th className="p-4 font-semibold w-auto">Progress</th>
+                  {role === 'OWNER' && <th className="p-4 font-semibold text-left w-1/6">Update</th>}
                 </tr>
               </thead>
               <tbody>
@@ -186,8 +189,12 @@ export default async function ProjectsPage() {
                             className="w-16 px-2 py-1 border border-gray-300 rounded-lg text-sm text-center" 
                           />
                           <span className="font-semibold">%</span>
-                          <button type="submit" className="bg-blue-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-700 transition">
-                            Simpan
+                          <button 
+                            type="submit" 
+                            className="inline-flex items-center gap-1.5 text-blue-600 hover:text-blue-800 text-sm font-medium transition ml-1"
+                          >
+                            <Save size={18} />
+                            <span>Simpan</span>
                           </button>
                         </form>
                       ) : (
@@ -195,38 +202,42 @@ export default async function ProjectsPage() {
                       )}
                     </td>
                     {role === 'OWNER' && (
-                      <td className="p-4 text-right">
-                        {project.status !== 'COMPLETED' ? (
-                          <form action={async () => {
-                            'use server';
-                            await prisma.project.update({
-                              where: { id: project.id },
-                              data: { status: 'COMPLETED', progress: 100 }
-                            });
-                          }}>
-                            <button 
-                              type="submit"
-                              className="bg-green-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-green-700 transition"
-                            >
-                              Selesaikan Proyek
-                            </button>
-                          </form>
-                        ) : (
-                          <form action={async () => {
-                            'use server';
-                            await prisma.project.update({
-                              where: { id: project.id },
-                              data: { status: 'ON_PROGRESS' }
-                            });
-                          }}>
-                            <button 
-                              type="submit"
-                              className="bg-amber-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-700 transition"
-                            >
-                              Ubah ke On Progress
-                            </button>
-                          </form>
-                        )}
+                      <td className="p-4 text-left">
+                        <div className="flex items-center justify-start gap-4">
+                          {project.status !== 'COMPLETED' ? (
+                            <form action={async () => {
+                              'use server';
+                              await prisma.project.update({
+                                where: { id: project.id },
+                                data: { status: 'COMPLETED', progress: 100 }
+                              });
+                            }}>
+                              <button 
+                                type="submit"
+                                className="inline-flex items-center gap-1.5 text-green-600 hover:text-green-800 text-sm font-medium transition"
+                              >
+                                <CheckCircle size={18} />
+                                <span>Selesaikan Proyek</span>
+                              </button>
+                            </form>
+                          ) : (
+                            <form action={async () => {
+                              'use server';
+                              await prisma.project.update({
+                                where: { id: project.id },
+                                data: { status: 'ON_PROGRESS' }
+                              });
+                            }}>
+                              <button 
+                                type="submit"
+                                className="inline-flex items-center gap-1.5 text-amber-600 hover:text-amber-800 text-sm font-medium transition"
+                              >
+                                <RefreshCw size={18} />
+                                <span>Ubah ke On Progress</span>
+                              </button>
+                            </form>
+                          )}
+                        </div>
                       </td>
                     )}
                   </tr>
