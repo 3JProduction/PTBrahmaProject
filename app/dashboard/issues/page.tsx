@@ -6,6 +6,14 @@ import Link from 'next/link';
 import { cookies } from 'next/headers';
 import prisma from '@/lib/prisma';
 
+// Kamus penerjemah level keparahan
+const severityMap: Record<string, string> = {
+  LOW: 'RENDAH',
+  MEDIUM: 'SEDANG',
+  HIGH: 'TINGGI',
+  CRITICAL: 'SANGAT TINGGI',
+};
+
 export default async function IssuesPage() {
   const role = cookies().get('userRole')?.value;
   const isPM = role === 'PROJECT_MANAGER' || role === 'OWNER';
@@ -37,7 +45,7 @@ export default async function IssuesPage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
             <AlertTriangle className="text-red-500" size={28} />
-            Issue Tracking
+            Laporan Kendala
           </h1>
           <p className="text-sm sm:text-base text-gray-500">Pantau dan selesaikan kendala yang terjadi di lapangan.</p>
         </div>
@@ -70,7 +78,7 @@ export default async function IssuesPage() {
                     issue.severity === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' : 
                     'bg-blue-100 text-blue-700'
                   }`}>
-                    {issue.severity}
+                    {severityMap[issue.severity] || issue.severity}
                   </span>
                 </div>
                 
@@ -93,7 +101,7 @@ export default async function IssuesPage() {
                   </div>
                 </div>
 
-                {/* Kolom Aksi Khusus PM (Mobile) - DIPERBARUI IDENTIK */}
+                {/* Kolom Aksi Khusus PM (Mobile) */}
                 {isPM && (
                   <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-6 mt-1">
                     <Link 
@@ -149,7 +157,7 @@ export default async function IssuesPage() {
                         issue.severity === 'MEDIUM' ? 'bg-yellow-100 text-yellow-700' : 
                         'bg-blue-100 text-blue-700'
                       }`}>
-                        {issue.severity}
+                        {severityMap[issue.severity] || issue.severity}
                       </span>
                     </td>
                     <td className="p-4 text-gray-600">{issue.reporter.name}</td>
@@ -161,7 +169,7 @@ export default async function IssuesPage() {
                       </span>
                     </td>
                     
-                    {/* Kolom Aksi Khusus PM (Desktop) - DIPERBARUI IDENTIK */}
+                    {/* Kolom Aksi Khusus PM (Desktop) */}
                     {isPM && (
                       <td className="p-4 text-center">
                         <div className="flex items-center justify-center gap-6">

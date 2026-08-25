@@ -117,10 +117,10 @@ export default async function CreateIssuePage() {
                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                 required
               >
-                <option value="LOW">LOW (Rendah)</option>
-                <option value="MEDIUM">MEDIUM (Sedang)</option>
-                <option value="HIGH">HIGH (Tinggi)</option>
-                <option value="CRITICAL">CRITICAL (Kritis)</option>
+                <option value="LOW">Rendah</option>
+                <option value="MEDIUM">Sedang</option>
+                <option value="HIGH">Tinggi</option>
+                <option value="CRITICAL">Kritis</option>
               </select>
             </div>
 
